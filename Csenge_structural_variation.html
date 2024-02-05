@@ -234,197 +234,43 @@ directory.</p>
 </div>
 <div id="running-local-pca" class="section level1">
 <h1>2. Running local PCA</h1>
+<p>INPUT: name of the chromosome</p>
+<p>OUTPUT:</p>
+<ul>
+<li>Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for
+bp [] and snp sizes [500,1000,5000,10_000]</li>
+<li>mds_coords.csv, mychromosome.regions.csv</li>
+</ul>
 <p>Local PCA is an R package, here is the GitHub page: <a href="https://github.com/petrelharp/local_pca" class="uri">https://github.com/petrelharp/local_pca</a>.</p>
 <p>Installation:</p>
 <pre><code>install.packages(&quot;data.table&quot;)
 devtools::install_github(&quot;petrelharp/local_pca/lostruct&quot;)
 library(lostruct)</code></pre>
-<p>On the page, they provide an Rscript to show how to use the package.
-I copied this and then slightly modified:</p>
-<ul>
-<li>Copy the R scripts over to your myscripts directory:
-<code>cp /netfiles/ecogen/structural_variation/run_lostruct.R ~/myscripts</code>
-and
-<code>cp /netfiles/ecogen/structural_variation/summarize_run.Rmd ~/myscripts</code></li>
-</ul>
-<div id="lets-look-at-the-scripts" class="section level2">
-<h2>Let’s look at the scripts</h2>
-<p>Type vim run_lostruct.R in the ~/myscripts directory.</p>
-</div>
-<div id="run-local-pca" class="section level2">
-<h2>Run local PCA</h2>
-<ul>
-<li><p>IMPORTANT: make sure to remove the original unfiltered bcf file
-from your <code>~/mydata/str_data</code> directory,
-<code>rm multi_bam_mychromosome.bcf</code>, because the package will
-read all .bcf files in the directory that you give it and we only want
-to run the package on the filtered bcf file.</p></li>
-<li><p><code>tmux new -s run_localPCA</code></p></li>
-<li><p><code>cd ~/mydata/str_data</code>. This way the results will
-automatically end up in this directory.</p></li>
-<li><p><code>Rscript ~/myscripts/run_lostruct.R -i ~/mydata/str_data -t snp -s 1000 -I /netfiles/ecogen/structural_variation/sample_info.tsv</code>
-We are running the Rscript with the “Rscript” command, just like we run
-the bash scripts with the “bash” command. -i specifies the input file
-location, -t specifies the way we are calculating the windows, which is
-based on SNPs for now. -s specifies the window size. -I specifies the
-location of the file I created to link the individual IDs in the bcf
-file with the 3 letter population name. This should take 15 minutes to
-an hour to run.</p></li>
-<li><p>Once the script finishes, you should have a folder called
-lostruct_results in <code>~/mydata/str_data</code>. cd into
-lostruct_results. Then, cd into a folder called something like
-type_snp_size_1000_weights_none_jobid_166584 (will be called different
-for you). Type <code>ll</code>.</p></li>
-<li><p>Output files:</p>
-<ul>
-<li><p>config.json -&gt; check with vim</p></li>
-<li><p>mds_coords.csv -&gt; wc -l -&gt; how many lines are there? each
-line corresponds to a window</p></li>
-<li><p>mychromosome.pca.csv -&gt; wc -l to check the number of rows and
-<code>awk -F&#39;,&#39; &#39;{print NF}&#39; mychromosome.pca.csv | sort -nu | tail -n 1</code>
-to check the number of columns -&gt; should be 283. For each window
-(rows), PC1 and PC2 for each individual (140) -&gt; input variables for
-the MDS</p></li>
-<li><p>mychromosome.regions.csv -&gt; windows information (will be
-important later)</p></li>
-</ul></li>
-</ul>
-</div>
+<p>On the github page, they provide an Rscript to show how to use the
+package. I copied this: <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R">run_lostruct.R</a></p>
+<p>No changes.</p>
+<p>They also have an example of plotting the data, I copied this as
+well. <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd">summarize_run.Rmd</a></p>
+<p>Changes: - do.pdfs &lt;- TRUE in line 14, - commented out warning in
+line 78, breaks code otherwise - added saving of corner pcas</p>
+<p><code>Rscript ~/myscripts/run_lostruct.R -i ~/mydata/str_data -t snp -s 1000 -I /netfiles/ecogen/structural_variation/sample_info.tsv</code></p>
+<p>Once the script finishes, you should have a folder called
+lostruct_results in <code>~/mydata/str_data</code>.</p>
+<p>type_snp_size_1000_weights_none_jobid_166584</p>
 <div id="visualise-results" class="section level2">
 <h2>Visualise results</h2>
-<p>NOTE: Make sure to change the
-<code>type_snp_size_1000_weights_none_jobid_166584</code> directory name
-everywhere in this tutorial to your directory name!</p>
-<p>Now we’ll use another script provided by the local PCA package to
-make an html with a series of plots.</p>
-<ul>
-<li><p><code>tmux attach-session -t run_localPCA</code></p></li>
-<li><p>cd into
-<code>~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/</code></p></li>
-<li><p>type
-<code>Rscript -e &#39;templater::render_template(&quot;~/myscripts/summarize_run.Rmd&quot;,output=&quot;~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html&quot;,change.rootdir=TRUE)&#39;</code></p></li>
-<li><p>This should only take a few minutes. Once done, you should have
-new files in your
-<code>type_snp_size_1000_weights_none_jobid_166584</code>
-directory.</p></li>
-<li><p>Open FileZilla on your computer. Move run_summary.html in the
-<code>~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584</code>
-directory to your computer.</p></li>
-<li><p>Find that file on your computer and open it in your favorite
-browser (e.g. Chrome).</p></li>
-</ul>
+<p><code>Rscript -e &#39;templater::render_template(&quot;~/myscripts/summarize_run.Rmd&quot;,output=&quot;~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html&quot;,change.rootdir=TRUE)&#39;</code></p>
 </div>
-<div id="select-regions-of-interest" class="section level2">
-<h2>Select regions of interest</h2>
-<p>In order to be able to get the genomic regions corresponding to a
-specific corner in the MDS plot, we will need to modify the plotting
-script (summarize_run.Rmd) such that it writes a csv file with the
-coordinates.</p>
-<ul>
-<li><p><code>cd ~/myscripts</code>, <code>vim summarize_run.Rmd</code>,
-hit I to enter the insert mode.</p></li>
-<li><p>Around line 195, the script creates a variable called
-corner.regions based on the mds corners. This variable contains a list
-of chromosome, start, end information for each window in each corners of
-the mds plot. So, all we need to do is insert a line
-<code>write.csv(corner.regions[[1]], &quot;first_corner.csv&quot;, row.names=FALSE)</code>
-under the line 198 (<code>}</code>) to save the genomic regions in the
-first corner.</p></li>
-<li><p>Hit <code>esc</code> and <code>:wq</code> to save your
-changes.</p></li>
-</ul>
-<p>Repeat steps above to rerun the plotting.</p>
-<ul>
-<li><p><code>tmux attach-session -t run_localPCA</code></p></li>
-<li><p>cd into
-<code>~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/</code></p></li>
-<li><p>type
-<code>Rscript -e &#39;templater::render_template(&quot;~/myscripts/summarize_run.Rmd&quot;,output=&quot;~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html&quot;,change.rootdir=TRUE)&#39;</code></p></li>
-<li><p>Now you should have a new file in
-<code>type_snp_size_1000_weights_none_jobid_166584</code> called
-<code>first_corner.csv</code>. Type <code>head first_corner.csv</code>
-to see the region information. NOTE: if you are not seeing the new file
-appear, you might have to delete the cache directory
-(<code>rm -r cache</code>) first, and then rerun the Rscript
-again.</p></li>
-</ul>
 </div>
-<div id="do-go-enrichment-for-the-selected-corner" class="section level2">
-<h2>Do GO Enrichment for the selected corner</h2>
-<p>In order to get a list of genes that are present in the selected
-windows, we will use an annotation file from ncbi: <a href="https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/" class="uri">https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/</a>.
-GFF is a standard file format to store genomic annotation information
-in. I have already downloaded this file and moved it to
-<code>/netfiles/ecogen/structural_variation/</code>, and named it
-genome_annotation.gff.</p>
-<p>Copy this file into your directory,
-<code>cp /netfiles/ecogen/structural_variation/genome_annotation.gff ~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584</code>
-Let’s take a look!</p>
-<p>To find an intersect between genes specified in the GFF file and
-coordinates in our first_corner.csv, we will use a package called
-bedtools. I have already installed this package for you. The
-intersectBed algorithm requires the first_corner.csv to be in a specific
-format (tab delimited, chromosome, start, end), so we’ll need to modify
-it.</p>
-<ul>
-<li><p><code>cd ~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584</code>
-if you are not there alread.</p></li>
-<li><p><code>head first_corner.csv</code> -&gt;</p></li>
-</ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="st">&quot;chrom&quot;</span><span class="ex">,</span><span class="st">&quot;start&quot;</span><span class="ex">,</span><span class="st">&quot;end&quot;</span><span class="ex">,</span><span class="st">&quot;pos&quot;</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,227538,246919,237228.5</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,246921,249982,248451.5</span></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,250053,258244,254148.5</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,268365,272067,270216</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,283027,289393,286210</span></span></code></pre></div>
-<ul>
-<li>Remove 4th column:
-<code>cut -d, -f1-3 first_corner.csv &gt; first_corner_formatted.csv</code>
--&gt;</li>
-</ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="st">&quot;chrom&quot;</span><span class="ex">,</span><span class="st">&quot;start&quot;</span><span class="ex">,</span><span class="st">&quot;end&quot;</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,227538,246919</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,246921,249982</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,250053,258244</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="st">&quot;NW_022145602.1&quot;</span><span class="ex">,268365,272067</span></span></code></pre></div>
-<ul>
-<li><p>Remove “s:
-<code>sed -i &#39;s/&quot;//g&#39; first_corner_formatted.csv</code></p></li>
-<li><p>Replace commas with tabs:
-<code>sed -i &#39;s/,/\t/g&#39; first_corner_formatted.csv</code> -&gt;</p></li>
-</ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">chrom</span>   start   end</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">NW_022145602.1</span>  227538  246919</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="ex">NW_022145602.1</span>  246921  249982</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="ex">NW_022145602.1</span>  250053  258244</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="ex">NW_022145602.1</span>  268365  272067</span></code></pre></div>
-<p>Now that we have the correct file format, let’s run the intersectBed
-algorythm:
-<code>/netfiles/ecogen/structural_variation/bedtools2/bin/intersectBed -a first_corner_formatted.csv -b genome_annotation.gff -wa -wb &gt; genes_first_corner.bed</code>
-Look at the genes_first_corner.bed file.</p>
-<p>To extract the gene names:
-<code>sed -n &quot;s/^.*gene=\(LOC[0-9]\+\).*$/\1/p&quot; genes_first_corner.bed &gt; gene_names_first_corner.txt</code></p>
-<p>You’ll see that a lot of the gene names are repeated. To discard
-repeats, type:
-<code>sort gene_names_first_corner.txt | uniq &gt; uni_gene_names_first_corner.txt</code></p>
-<p>Go to FileZilla on your computer and download this file
-(mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/uni_gene_names_first_corner.txt).</p>
-<p>Now we can run a gene ontology analysis on these genes!</p>
-<ul>
-<li><p>Open the txt file above, select all, copy (Ctrl C).</p></li>
-<li><p>Go to: <a href="https://geneontology.org/" class="uri">https://geneontology.org/</a>, paste the LOC names into the
-window on the right.</p></li>
-<li><p>Select Strongylocentrotus purpuratus (purple sea urchin) from the
-drop down menu instead of Homo sapiens. Click Launch.</p></li>
-<li><p>If you don’t get any significantly enriched biological processes,
-you can change the Annotation Data Set in the drop down menu and click
-Launch analysis. You can also play around with the Test type and the
-correction method. Don’t worry if you still don’t get anything, that is
-also a valid result!</p></li>
-</ul>
-<p>Congrats! You are all done with this tutorial! :)</p>
-<p>References:</p>
+<div id="finding-regions-of-interest" class="section level1">
+<h1>3. Finding regions of interest</h1>
+<p>INPUT: MDS output files for a specific chromosome OUTPUT: Outlier
+region genomic coordinates</p>
 </div>
+<div id="further-analysis-of-region" class="section level1">
+<h1>4. Further analysis of region</h1>
+<p>INPUT: Genomic coordinates of interest OUTPUT: PCA for that region,
+Fst, LD, nuc diversity, GO</p>
 </div>
 </section>
 

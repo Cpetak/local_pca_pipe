@@ -97,6 +97,7 @@ Output: bcf files in the `/users/c/p/cpetak/EG2023/structural_variation/backup/f
 
 # 2. Running local PCA
 INPUT: name of the chromosome
+
 OUTPUT: 
 
   - Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for bp [] and snp sizes [500,1000,5000,10_000]
@@ -111,14 +112,17 @@ devtools::install_github("petrelharp/local_pca/lostruct")
 library(lostruct)
 ```
 
-On the page, they provide an Rscript to show how to use the package. I copied this: 
+On the github page, they provide an Rscript to show how to use the package. I copied this: [run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
 
-[run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
+No changes.
 
-For other changes: 
-do.pdfs <- TRUE in line 14, 
-commented out warning in line 78, breaks code otherwise
-added saving of corner pcas
+They also have an example of plotting the data, I copied this as well.
+[summarize_run.Rmd](https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd)
+
+Changes: 
+- do.pdfs <- TRUE in line 14, 
+- commented out warning in line 78, breaks code otherwise
+- added saving of corner pcas
 
 `Rscript ~/myscripts/run_lostruct.R -i ~/mydata/str_data -t snp -s 1000 -I /netfiles/ecogen/structural_variation/sample_info.tsv` 
 
