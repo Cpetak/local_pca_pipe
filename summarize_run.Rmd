@@ -54,7 +54,7 @@ if (!file.exists("config.json")) {
 opt <- fromJSON("config.json")
 
 text_data <- readLines("percent_file.txt")
-alpha <- as.integer(text_data)
+alpha <- as.numeric(text_data)
 
 if (is.null(opt$weights)) { opt$weights <- 1 }
 

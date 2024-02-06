@@ -10,13 +10,15 @@ input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_ind
 
 echo $input_dir
 
-cd ~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${$3}_chromosome_${$1}
+cd ~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}
 echo $4 > percent_file.txt #the R script below will be looking for this file! easier than figuring out how to pass in as an argument
+
+cd ~/WGS/local_pca_pipe
 
 FILE=$(mktemp)
 cat header.txt >> $FILE
-echo "Rscript -e 'templater::render_template("~/WGS/local_pca_pipe/summarize_run.Rmd",output="~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${$3}_chromosome_${$1}/run_summary.html",change.rootdir=TRUE)'" >> $FILE
-#sbatch $FILE
-cat $FILE
+echo "Rscript -e 'templater::render_template(\"~/WGS/local_pca_pipe/summarize_run.Rmd\",output=\"~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}/run_summary.html\",change.rootdir=TRUE)'" >> $FILE
+sbatch $FILE
+#cat $FILE
 sleep 0.1
 rm $FILE
