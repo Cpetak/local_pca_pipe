@@ -95,11 +95,10 @@ echo "Done!"
 
 Output: bcf files in the `/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index ` directory.
 
-# 2. Running local PCA
+# 2 Local PCA results
 INPUT: name of the chromosome
 
 OUTPUT: 
-
   - Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for bp [] and snp sizes [500,1000,5000,10_000]
   - mds_coords.csv, mychromosome.regions.csv
 
@@ -112,9 +111,13 @@ devtools::install_github("petrelharp/local_pca/lostruct")
 library(lostruct)
 ```
 
+## 2.1 Run lostruct
+
 On the github page, they provide an Rscript to show how to use the package. I copied this: [run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
 
 No changes.
+
+# 2.2 Visualise and gather data
 
 They also have an example of plotting the data, I copied this as well.
 [summarize_run.Rmd](https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd)
@@ -124,13 +127,9 @@ Changes:
 - commented out warning in line 78, breaks code otherwise
 - added saving of corner pcas
 
-`Rscript ~/myscripts/run_lostruct.R -i ~/mydata/str_data -t snp -s 1000 -I /netfiles/ecogen/structural_variation/sample_info.tsv` 
-
 Once the script finishes, you should have a folder called lostruct_results in `~/mydata/str_data`. 
 
 type_snp_size_1000_weights_none_jobid_166584
-
-## Visualise results
 
 `Rscript -e 'templater::render_template("~/myscripts/summarize_run.Rmd",output="~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html",change.rootdir=TRUE)'`
 

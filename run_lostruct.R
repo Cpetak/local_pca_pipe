@@ -29,15 +29,19 @@ option_list <- list(
         make_option( c("-M","--missing"),   type="double", default=0.0, help="Percent data to introduce as missing.  [default: %default]"),
         make_option( c("-S","--subsample"), type="double", default=1.0, help="Percent of individuals to retain, uniformly across populations.  [default: %default]"),
         make_option( c("-o","--outdir"), type="character",             help="Directory to save results to.  [default: lostruct_results/type_%type_size_%size_jobid_%jobid/]"),
+        make_option( c("-c","--chromname"), type="character",             help="Name of the chromosome, used for output directory naming"),
         make_option( c("-j","--jobid"),  type="character", default=formatC(1e6*runif(1),width=6,format="d",flag="0"),   help="Unique job id. [default random]")
     )
 opt <- parse_args(OptionParser(option_list=option_list,description=usage))
+#splitted<-strsplit(opt$input_dir, split = "/")[[1]]
+#chr_name<-splitted[length(splitted)]
 if (is.null(opt$outdir)) { opt$outdir <- file.path("lostruct_results", 
-                                   sprintf( "type_%s_size_%d_weights_%s_jobid_%s", 
+                                   sprintf( "type_%s_size_%d_chromosome_%s",#_jobid_%s", 
                                            opt$type, 
-                                           opt$size, 
-                                           if (is.null(opt$weightfile)) { "none" } else { gsub("[.].*","",basename(opt$weightfile)) }, 
-                                           opt$jobid ) ) }
+                                           opt$size,
+                                           opt$chromname ) ) }
+                                           #if (is.null(opt$weightfile)) { "none" } else { gsub("[.].*","",basename(opt$weightfile)) }, 
+                                           #opt$jobid ) ) }
 if (is.null(opt$input_dir) || is.null(opt$type) || is.null(opt$size)) { stop(usage) }
 
 opt$start.time <- Sys.time()
