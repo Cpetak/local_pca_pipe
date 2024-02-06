@@ -232,35 +232,68 @@ mapping the raw reads to the S. purpuratus reference genome (Spur ver.
 directory.</p>
 </div>
 </div>
-<div id="running-local-pca" class="section level1">
-<h1>2. Running local PCA</h1>
+<div id="local-pca-results" class="section level1">
+<h1>2 Local PCA results</h1>
 <p>INPUT: name of the chromosome</p>
-<p>OUTPUT:</p>
-<ul>
-<li>Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for
-bp [] and snp sizes [500,1000,5000,10_000]</li>
-<li>mds_coords.csv, mychromosome.regions.csv</li>
-</ul>
+<p>OUTPUT: - Local PCA MDS plot with chromosome plot + PCAs for the 3
+corners for bp [] and snp sizes [500,1000,5000,10_000] - mds_coords.csv,
+mychromosome.regions.csv</p>
 <p>Local PCA is an R package, here is the GitHub page: <a href="https://github.com/petrelharp/local_pca" class="uri">https://github.com/petrelharp/local_pca</a>.</p>
 <p>Installation:</p>
 <pre><code>install.packages(&quot;data.table&quot;)
 devtools::install_github(&quot;petrelharp/local_pca/lostruct&quot;)
 library(lostruct)</code></pre>
+<div id="run-lostruct" class="section level2">
+<h2>2.1 Run lostruct</h2>
 <p>On the github page, they provide an Rscript to show how to use the
 package. I copied this: <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R">run_lostruct.R</a></p>
-<p>No changes.</p>
+<p>No changes, expect output folder has chromosome name instead of
+random id.</p>
+<pre><code>#conda activate grn
+#spack load bcftools@1.10.2
+
+echo &quot;Chromosome number: $1&quot;
+
+input_dir=&quot;/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}&quot;
+
+echo $input_dir
+
+for snp in 500 1000 5000 10000
+do
+    echo &quot;$snp&quot;
+    FILE=$(mktemp)
+    cat header.txt &gt;&gt; $FILE
+    echo &quot;Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}&quot; &gt;&gt; $FILE
+    sbatch $FILE
+    #cat $FILE
+    sleep 0.1
+    rm $FILE
+done
+
+#for bp in $(seq 500 1000 5000 10000)
+#do
+    #echo &quot;$bp&quot;
+    #FILE=$(mktemp)
+    #cat header.txt &gt;&gt; $FILE
+    #echo &quot;Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t bp -s ${bp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}&quot; &gt;&gt; $FILE
+    #sbatch $FILE
+    #cat $FILE
+    #sleep 0.1
+    #rm $FILE
+#done</code></pre>
+<p>To run: <code>bash 2_1_local_pca.sh NW_022145594.1</code></p>
+</div>
+</div>
+<div id="visualise-and-gather-data" class="section level1">
+<h1>2.2 Visualise and gather data</h1>
 <p>They also have an example of plotting the data, I copied this as
 well. <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd">summarize_run.Rmd</a></p>
 <p>Changes: - do.pdfs &lt;- TRUE in line 14, - commented out warning in
 line 78, breaks code otherwise - added saving of corner pcas</p>
-<p><code>Rscript ~/myscripts/run_lostruct.R -i ~/mydata/str_data -t snp -s 1000 -I /netfiles/ecogen/structural_variation/sample_info.tsv</code></p>
 <p>Once the script finishes, you should have a folder called
 lostruct_results in <code>~/mydata/str_data</code>.</p>
 <p>type_snp_size_1000_weights_none_jobid_166584</p>
-<div id="visualise-results" class="section level2">
-<h2>Visualise results</h2>
 <p><code>Rscript -e &#39;templater::render_template(&quot;~/myscripts/summarize_run.Rmd&quot;,output=&quot;~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html&quot;,change.rootdir=TRUE)&#39;</code></p>
-</div>
 </div>
 <div id="finding-regions-of-interest" class="section level1">
 <h1>3. Finding regions of interest</h1>

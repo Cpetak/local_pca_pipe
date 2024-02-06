@@ -115,7 +115,43 @@ library(lostruct)
 
 On the github page, they provide an Rscript to show how to use the package. I copied this: [run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
 
-No changes.
+No changes, expect output folder has chromosome name instead of random id.
+
+```
+#conda activate grn
+#spack load bcftools@1.10.2
+
+echo "Chromosome number: $1"
+
+input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}"
+
+echo $input_dir
+
+for snp in 500 1000 5000 10000
+do
+	echo "$snp"
+	FILE=$(mktemp)
+  	cat header.txt >> $FILE
+  	echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
+    sbatch $FILE
+  	#cat $FILE
+    sleep 0.1
+  	rm $FILE
+done
+
+#for bp in $(seq 500 1000 5000 10000)
+#do
+	#echo "$bp"
+	#FILE=$(mktemp)
+  	#cat header.txt >> $FILE
+  	#echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t bp -s ${bp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
+    #sbatch $FILE
+  	#cat $FILE
+    #sleep 0.1
+  	#rm $FILE
+#done
+```
+To run: `bash 2_1_local_pca.sh NW_022145594.1`
 
 # 2.2 Visualise and gather data
 
@@ -126,10 +162,10 @@ Changes:
 - do.pdfs <- TRUE in line 14, 
 - commented out warning in line 78, breaks code otherwise
 - added saving of corner pcas
+- added getting the percent corner (i.e. alpha) as a variable read from a file
 
-Once the script finishes, you should have a folder called lostruct_results in `~/mydata/str_data`. 
+Once the 2.1 script finishes, you should have a folder called lostruct_results and a folder in it, named type_snp_size_10000_chromosome_NW_022145594.1.
 
-type_snp_size_1000_weights_none_jobid_166584
 
 `Rscript -e 'templater::render_template("~/myscripts/summarize_run.Rmd",output="~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html",change.rootdir=TRUE)'`
 

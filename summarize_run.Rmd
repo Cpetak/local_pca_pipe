@@ -52,6 +52,10 @@ if (!file.exists("config.json")) {
     stop(paste("File", file.path(getwd(), "config.json"), "does not exist. Cannot continue."))
 }
 opt <- fromJSON("config.json")
+
+text_data <- readLines("percent_file.txt")
+alpha <- as.integer(text_data)
+
 if (is.null(opt$weights)) { opt$weights <- 1 }
 
 # original data files
@@ -140,7 +144,7 @@ if (do.pdfs) { pdf_copy() }
 
 Here are the extreme windows in the MDS plot:
 ```{r get_corners}
-mds.corners <- corners( mds.coords[,mds.cols[1:2]], prop=.05 )
+mds.corners <- corners( mds.coords[,mds.cols[1:2]], prop=alpha )
 # set up colors and pchs for corners
 corner.cols <- brewer.pal(3,"Dark2")
 corner.pch <- c(15,17,19)
