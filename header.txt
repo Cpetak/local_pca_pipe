@@ -20,3 +20,5 @@ cd ${SLURM_SUBMIT_DIR}
 echo "Starting sbatch script myscript.sh at:`date`"
 
 cd /users/c/p/cpetak/WGS/local_pca_pipe
+
+
