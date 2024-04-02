@@ -100,7 +100,7 @@ INPUT: name of the chromosome
 
 OUTPUT: 
   - Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for bp [] and snp sizes [500,1000,5000,10_000]
-  - mds_coords.csv, mychromosome.regions.csv
+  - mds_coords.csv, mychromosome.regions.csv, pca_corners
 
 Local PCA is an R package, here is the GitHub page: <https://github.com/petrelharp/local_pca>. 
 
@@ -166,15 +166,50 @@ Changes:
 
 Once the 2.1 script finishes, you should have a folder called lostruct_results and a folder in it, named type_snp_size_10000_chromosome_NW_022145594.1.
 
+```
+#conda activate grn
+#spack load bcftools@1.10.2
 
-`Rscript -e 'templater::render_template("~/myscripts/summarize_run.Rmd",output="~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html",change.rootdir=TRUE)'`
+echo "Chromosome number: $1"
+echo "Type: $2"
+echo "Size: $3"
+echo "Percent corner: $4"
 
+input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}"
 
+echo $input_dir
+
+cd ~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}
+echo $4 > percent_file.txt #the R script below will be looking for this file! easier than figuring out how to pass in as an argument
+
+cd ~/WGS/local_pca_pipe
+
+FILE=$(mktemp)
+cat header.txt >> $FILE
+echo "Rscript -e 'templater::render_template(\"~/WGS/local_pca_pipe/summarize_run.Rmd\",output=\"~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}/run_summary.html\",change.rootdir=TRUE)'" >> $FILE
+sbatch $FILE
+#cat $FILE
+sleep 0.1
+rm $FILE
+```
+To run: `bash 2_2_local_pca_vis.sh NW_022145594.1 snp 10000 0.01`
+
+It is chromosome, type, size, alpha (percent outliers considered).
+To run for every snp length independently, a one-line: 
+
+`for snp in 500 1000 5000 10000; do bash 2_2_local_pca_vis.sh NW_022145594.1 snp $snp 0.05; done`
+Then can rerun specific ones to adjust alpha.
+
+DONE UNTIL HERE
 
 # 3. Finding regions of interest
-INPUT: MDS output files for a specific chromosome
+INPUT: MDS output files for a specific chromosome, specific lostruct run/visualisation
 OUTPUT: Outlier region genomic coordinates
 
+# 4. Grouping individuals by genotype for specific region
+INPUT: Coordinates of region of interest, bcf file of chromosome
+OUT: AA, Aa or aa for each individual and PCA plot
+
 # 4. Further analysis of region
-INPUT: Genomic coordinates of interest
-OUTPUT: PCA for that region, Fst, LD, nuc diversity, GO
+INPUT: Genomic coordinates of interest, genotype category for each individual
+OUTPUT: Fst, LD, nuc diversity, GO
