@@ -160,8 +160,8 @@ to these bcf files.</p>
 <p><a href="https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/" class="uri">https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000002235.5/</a></p>
 <p>N50: 37.3 Mb</p>
 </div>
-<div id="the-mapping-algorythm" class="section level3">
-<h3>The mapping algorythm</h3>
+<div id="the-mapping-algorithm" class="section level3">
+<h3>The mapping algorithm</h3>
 <p>Input: List of read files (R1 and R2)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="cf">while</span> <span class="bu">read</span> <span class="va">line</span> <span class="kw">;</span> <span class="cf">do</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>        <span class="va">F1</span><span class="op">=</span><span class="va">$(</span><span class="fu">cut</span> <span class="at">-d</span> <span class="st">&#39; &#39;</span> <span class="at">-f1</span> <span class="op">&lt;&lt;&lt;</span> <span class="va">$line)</span></span>
@@ -235,9 +235,12 @@ directory.</p>
 <div id="local-pca-results" class="section level1">
 <h1>2 Local PCA results</h1>
 <p>INPUT: name of the chromosome</p>
-<p>OUTPUT: - Local PCA MDS plot with chromosome plot + PCAs for the 3
-corners for bp [] and snp sizes [500,1000,5000,10_000] - mds_coords.csv,
-mychromosome.regions.csv</p>
+<p>OUTPUT:</p>
+<ul>
+<li>Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for
+bp [] and snp sizes [500,1000,5000,10_000]</li>
+<li>mds_coords.csv, mychromosome.regions.csv, pca_corners</li>
+</ul>
 <p>Local PCA is an R package, here is the GitHub page: <a href="https://github.com/petrelharp/local_pca" class="uri">https://github.com/petrelharp/local_pca</a>.</p>
 <p>Installation:</p>
 <pre><code>install.packages(&quot;data.table&quot;)
@@ -289,21 +292,58 @@ done
 <p>They also have an example of plotting the data, I copied this as
 well. <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd">summarize_run.Rmd</a></p>
 <p>Changes: - do.pdfs &lt;- TRUE in line 14, - commented out warning in
-line 78, breaks code otherwise - added saving of corner pcas</p>
-<p>Once the script finishes, you should have a folder called
-lostruct_results in <code>~/mydata/str_data</code>.</p>
-<p>type_snp_size_1000_weights_none_jobid_166584</p>
-<p><code>Rscript -e &#39;templater::render_template(&quot;~/myscripts/summarize_run.Rmd&quot;,output=&quot;~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html&quot;,change.rootdir=TRUE)&#39;</code></p>
+line 78, breaks code otherwise - added saving of corner pcas - added
+getting the percent corner (i.e. alpha) as a variable read from a
+file</p>
+<p>Once the 2.1 script finishes, you should have a folder called
+lostruct_results and a folder in it, named
+type_snp_size_10000_chromosome_NW_022145594.1.</p>
+<pre><code>#conda activate grn
+#spack load bcftools@1.10.2
+
+echo &quot;Chromosome number: $1&quot;
+echo &quot;Type: $2&quot;
+echo &quot;Size: $3&quot;
+echo &quot;Percent corner: $4&quot;
+
+input_dir=&quot;/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}&quot;
+
+echo $input_dir
+
+cd ~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}
+echo $4 &gt; percent_file.txt #the R script below will be looking for this file! easier than figuring out how to pass in as an argument
+
+cd ~/WGS/local_pca_pipe
+
+FILE=$(mktemp)
+cat header.txt &gt;&gt; $FILE
+echo &quot;Rscript -e &#39;templater::render_template(\&quot;~/WGS/local_pca_pipe/summarize_run.Rmd\&quot;,output=\&quot;~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}/run_summary.html\&quot;,change.rootdir=TRUE)&#39;&quot; &gt;&gt; $FILE
+sbatch $FILE
+#cat $FILE
+sleep 0.1
+rm $FILE</code></pre>
+<p>To run:
+<code>bash 2_2_local_pca_vis.sh NW_022145594.1 snp 10000 0.01</code></p>
+<p>It is chromosome, type, size, alpha (percent outliers considered). To
+run for every snp length independently, a one-line:</p>
+<p><code>for snp in 500 1000 5000 10000; do bash 2_2_local_pca_vis.sh NW_022145594.1 snp $snp 0.05; done</code>
+Then can rerun specific ones to adjust alpha.</p>
+<p>DONE UNTIL HERE</p>
 </div>
 <div id="finding-regions-of-interest" class="section level1">
 <h1>3. Finding regions of interest</h1>
-<p>INPUT: MDS output files for a specific chromosome OUTPUT: Outlier
-region genomic coordinates</p>
+<p>INPUT: MDS output files for a specific chromosome, specific lostruct
+run/visualisation OUTPUT: Outlier region genomic coordinates</p>
+</div>
+<div id="grouping-individuals-by-genotype-for-specific-region" class="section level1">
+<h1>4. Grouping individuals by genotype for specific region</h1>
+<p>INPUT: Coordinates of region of interest, bcf file of chromosome OUT:
+AA, Aa or aa for each individual and PCA plot</p>
 </div>
 <div id="further-analysis-of-region" class="section level1">
 <h1>4. Further analysis of region</h1>
-<p>INPUT: Genomic coordinates of interest OUTPUT: PCA for that region,
-Fst, LD, nuc diversity, GO</p>
+<p>INPUT: Genomic coordinates of interest, genotype category for each
+individual OUTPUT: Fst, LD, nuc diversity, GO</p>
 </div>
 </section>
 

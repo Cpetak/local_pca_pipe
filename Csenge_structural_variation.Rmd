@@ -4,15 +4,20 @@ output:
   prettydoc::html_pretty:
     theme: cayman
 fontsize: 18pt
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Using local PCA on the urchins
 
-
 # 1. Input data processing
-The pipeline will start from filtered bcf files, one for each of the 21 chromosomes.
 
-Below is the steps that I followed to get from the raw sequence files to these bcf files.
+The pipeline will start from filtered bcf files, one for each of the 21
+chromosomes.
+
+Below is the steps that I followed to get from the raw sequence files to
+these bcf files.
 
 ## Mapped reads to the reference
 
@@ -22,7 +27,7 @@ Below is the steps that I followed to get from the raw sequence files to these b
 
 N50: 37.3 Mb
 
-### The mapping algorythm
+### The mapping algorithm
 
 Input: List of read files (R1 and R2)
 
@@ -44,14 +49,18 @@ while read line ; do
 done < $1
 ```
 
-The Burrows-Wheeler Alignment Tool (BWA) MEM algorithm was used for mapping the raw reads to the S. purpuratus reference genome (Spur ver. 5.0, scaffold N50 ∼37 Mbp). The average coverage for each individual was 6.42±0.78, with an average mapping rate of 81.6±0.01.
+The Burrows-Wheeler Alignment Tool (BWA) MEM algorithm was used for
+mapping the raw reads to the S. purpuratus reference genome (Spur ver.
+5.0, scaffold N50 ∼37 Mbp). The average coverage for each individual was
+6.42±0.78, with an average mapping rate of 81.6±0.01.
 
 ## Called variants for each chromosome across all individuals
 
 Input:
 
 -   21 chromosome names
--   list_of_files.txt, 140 lines, line 1: `/users/c/p/cpetak/WGS/BWA_out/BOD_18170X61_200925_A00421_0244_AHKML5DSXY_S81_L002_R1_001.rmdup.bam`
+-   list_of_files.txt, 140 lines, line 1:
+    `/users/c/p/cpetak/WGS/BWA_out/BOD_18170X61_200925_A00421_0244_AHKML5DSXY_S81_L002_R1_001.rmdup.bam`
 
 ```{bash, eval = FALSE}
 while read line ; do
@@ -93,19 +102,26 @@ echo "Indexed bcf"
 echo "Done!"
 ```
 
-Output: bcf files in the `/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index ` directory.
+Output: bcf files in the
+`/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index`
+directory.
 
 # 2 Local PCA results
+
 INPUT: name of the chromosome
 
-OUTPUT: 
-  - Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for bp [] and snp sizes [500,1000,5000,10_000]
-  - mds_coords.csv, mychromosome.regions.csv
+OUTPUT:
 
-Local PCA is an R package, here is the GitHub page: <https://github.com/petrelharp/local_pca>. 
+-   Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for
+    bp [] and snp sizes [500,1000,5000,10_000]
+-   mds_coords.csv, mychromosome.regions.csv, pca_corners
+
+Local PCA is an R package, here is the GitHub page:
+<https://github.com/petrelharp/local_pca>.
 
 Installation:
-```
+
+```         
 install.packages("data.table")
 devtools::install_github("petrelharp/local_pca/lostruct")
 library(lostruct)
@@ -113,11 +129,14 @@ library(lostruct)
 
 ## 2.1 Run lostruct
 
-On the github page, they provide an Rscript to show how to use the package. I copied this: [run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
+On the github page, they provide an Rscript to show how to use the
+package. I copied this:
+[run_lostruct.R](https://github.com/Cpetak/local_pca_pipe/blob/main/run_lostruct.R)
 
-No changes, expect output folder has chromosome name instead of random id.
+No changes, expect output folder has chromosome name instead of random
+id.
 
-```
+```         
 #conda activate grn
 #spack load bcftools@1.10.2
 
@@ -129,28 +148,29 @@ echo $input_dir
 
 for snp in 500 1000 5000 10000
 do
-	echo "$snp"
-	FILE=$(mktemp)
-  	cat header.txt >> $FILE
-  	echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
+    echo "$snp"
+    FILE=$(mktemp)
+    cat header.txt >> $FILE
+    echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
     sbatch $FILE
-  	#cat $FILE
+    #cat $FILE
     sleep 0.1
-  	rm $FILE
+    rm $FILE
 done
 
 #for bp in $(seq 500 1000 5000 10000)
 #do
-	#echo "$bp"
-	#FILE=$(mktemp)
-  	#cat header.txt >> $FILE
-  	#echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t bp -s ${bp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
+    #echo "$bp"
+    #FILE=$(mktemp)
+    #cat header.txt >> $FILE
+    #echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t bp -s ${bp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
     #sbatch $FILE
-  	#cat $FILE
+    #cat $FILE
     #sleep 0.1
-  	#rm $FILE
+    #rm $FILE
 #done
 ```
+
 To run: `bash 2_1_local_pca.sh NW_022145594.1`
 
 # 2.2 Visualise and gather data
@@ -158,23 +178,62 @@ To run: `bash 2_1_local_pca.sh NW_022145594.1`
 They also have an example of plotting the data, I copied this as well.
 [summarize_run.Rmd](https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd)
 
-Changes: 
-- do.pdfs <- TRUE in line 14, 
-- commented out warning in line 78, breaks code otherwise
-- added saving of corner pcas
-- added getting the percent corner (i.e. alpha) as a variable read from a file
+Changes: - do.pdfs \<- TRUE in line 14, - commented out warning in line
+78, breaks code otherwise - added saving of corner pcas - added getting
+the percent corner (i.e. alpha) as a variable read from a file
 
-Once the 2.1 script finishes, you should have a folder called lostruct_results and a folder in it, named type_snp_size_10000_chromosome_NW_022145594.1.
+Once the 2.1 script finishes, you should have a folder called
+lostruct_results and a folder in it, named
+type_snp_size_10000_chromosome_NW_022145594.1.
 
+```         
+#conda activate grn
+#spack load bcftools@1.10.2
 
-`Rscript -e 'templater::render_template("~/myscripts/summarize_run.Rmd",output="~/mydata/str_data/lostruct_results/type_snp_size_1000_weights_none_jobid_166584/run_summary.html",change.rootdir=TRUE)'`
+echo "Chromosome number: $1"
+echo "Type: $2"
+echo "Size: $3"
+echo "Percent corner: $4"
 
+input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}"
 
+echo $input_dir
+
+cd ~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}
+echo $4 > percent_file.txt #the R script below will be looking for this file! easier than figuring out how to pass in as an argument
+
+cd ~/WGS/local_pca_pipe
+
+FILE=$(mktemp)
+cat header.txt >> $FILE
+echo "Rscript -e 'templater::render_template(\"~/WGS/local_pca_pipe/summarize_run.Rmd\",output=\"~/WGS/local_pca_pipe/lostruct_results/type_${2}_size_${3}_chromosome_${1}/run_summary.html\",change.rootdir=TRUE)'" >> $FILE
+sbatch $FILE
+#cat $FILE
+sleep 0.1
+rm $FILE
+```
+
+To run: `bash 2_2_local_pca_vis.sh NW_022145594.1 snp 10000 0.01`
+
+It is chromosome, type, size, alpha (percent outliers considered). To
+run for every snp length independently, a one-line:
+
+`for snp in 500 1000 5000 10000; do bash 2_2_local_pca_vis.sh NW_022145594.1 snp $snp 0.05; done`
+Then can rerun specific ones to adjust alpha.
+
+DONE UNTIL HERE
 
 # 3. Finding regions of interest
-INPUT: MDS output files for a specific chromosome
-OUTPUT: Outlier region genomic coordinates
+
+INPUT: MDS output files for a specific chromosome, specific lostruct
+run/visualisation OUTPUT: Outlier region genomic coordinates
+
+# 4. Grouping individuals by genotype for specific region
+
+INPUT: Coordinates of region of interest, bcf file of chromosome OUT:
+AA, Aa or aa for each individual and PCA plot
 
 # 4. Further analysis of region
-INPUT: Genomic coordinates of interest
-OUTPUT: PCA for that region, Fst, LD, nuc diversity, GO
+
+INPUT: Genomic coordinates of interest, genotype category for each
+individual OUTPUT: Fst, LD, nuc diversity, GO
