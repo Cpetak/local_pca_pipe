@@ -238,8 +238,9 @@ directory.</p>
 <p>OUTPUT:</p>
 <ul>
 <li>Local PCA MDS plot with chromosome plot + PCAs for the 3 corners for
-bp [] and snp sizes [500,1000,5000,10_000]</li>
-<li>mds_coords.csv, mychromosome.regions.csv, pca_corners</li>
+bp [<em>testing</em>] and SNP sizes [500,1000,5000,10_000]</li>
+<li>mds_coords.csv (2D MDS plot coordinates), mychromosome.regions.csv
+(genomic position of windows), pca_corners</li>
 </ul>
 <p>Local PCA is an R package, here is the GitHub page: <a href="https://github.com/petrelharp/local_pca" class="uri">https://github.com/petrelharp/local_pca</a>.</p>
 <p>Installation:</p>
@@ -291,10 +292,14 @@ done
 <h1>2.2 Visualise and gather data</h1>
 <p>They also have an example of plotting the data, I copied this as
 well. <a href="https://github.com/Cpetak/local_pca_pipe/blob/main/summarize_run.Rmd">summarize_run.Rmd</a></p>
-<p>Changes: - do.pdfs &lt;- TRUE in line 14, - commented out warning in
-line 78, breaks code otherwise - added saving of corner pcas - added
-getting the percent corner (i.e. alpha) as a variable read from a
-file</p>
+<p>Changes:</p>
+<ul>
+<li><p>do.pdfs &lt;- TRUE in line 14,</p></li>
+<li><p>commented out warning in line 78, breaks code otherwise</p></li>
+<li><p>added saving of corner pcas</p></li>
+<li><p>added getting the percent corner (i.e. alpha) as a variable read
+from a file</p></li>
+</ul>
 <p>Once the 2.1 script finishes, you should have a folder called
 lostruct_results and a folder in it, named
 type_snp_size_10000_chromosome_NW_022145594.1.</p>
@@ -328,22 +333,56 @@ rm $FILE</code></pre>
 run for every snp length independently, a one-line:</p>
 <p><code>for snp in 500 1000 5000 10000; do bash 2_2_local_pca_vis.sh NW_022145594.1 snp $snp 0.05; done</code>
 Then can rerun specific ones to adjust alpha.</p>
-<p>DONE UNTIL HERE</p>
 </div>
 <div id="finding-regions-of-interest" class="section level1">
 <h1>3. Finding regions of interest</h1>
-<p>INPUT: MDS output files for a specific chromosome, specific lostruct
-run/visualisation OUTPUT: Outlier region genomic coordinates</p>
+<p>INPUT: MDS output files for a specific chromosome, for a specific
+type of window size (snp vs bp)</p>
+<p>Python file, finding_outlier_windows.py</p>
+<p>To run:
+<code>python finding_outlier_windows.py NW_022145594.1 snp</code></p>
+<p>You can add an optional argument <code>--thr 0.2</code> to adjust the
+MDS outlier threshold.</p>
+<p>OUTPUT: Outlier region genomic coordinates for a specific chromosome
+for each window size tested</p>
 </div>
 <div id="grouping-individuals-by-genotype-for-specific-region" class="section level1">
 <h1>4. Grouping individuals by genotype for specific region</h1>
-<p>INPUT: Coordinates of region of interest, bcf file of chromosome OUT:
-AA, Aa or aa for each individual and PCA plot</p>
+<p>INPUT: Coordinates of region of interest, bcf file of chromosome</p>
+<p>Now that we have regions of interest (to recap: local pca -&gt; mds
+values -&gt; outlier region coordinates) we should first look at the PCA
+of the individuals based on that region. Yes, technically, this is what
+local PCA is doing already, but it is cleaner and safer to start fresh
+from the bcf files and do our own, independent PCA. The result should be
+the same or similar! it might not be exactly the same because the PCAs
+that are plotted as part of the local PCA pipe line only include outlier
+windows, whereas here we are going to take all SNPs in a specific region
+for the PCA analysis, and this might include windows that were not
+outliers in the local PCA analysis.</p>
+<p>Step 1: Make a vcf file that only includes the region of interest for
+our chromosome.</p>
+<p>run: <code>bash subset_bcf.sh NW_022145594.1 12670717 16440127</code>
+where it is chromosome, start, end. Looks for a vcf file in the common
+data folder for that chromosome (EG2023), output is also a vcf in the
+curr directory</p>
+<p>Step 2: Convert vcf to gds</p>
+<p>run:
+<code>Rscript vcf2gds.R NW_022145594.1_12670717_16440127.vcf NW_022145594.1_12670717_16440127</code>
+input filename, output file name (it will add .gds)</p>
+<p>Step 3: Do PCA from the gds file</p>
+<p>run:
+<code>Rscript do_pca.R NW_022145594.1_12670717_16440127.gds</code> does
+PCA and writes PC1 and PC2 to csv files.</p>
+<p>Step 4: Assign individuals to genotype groups, make plots, calculate
+HW equilibrium</p>
+<p>OUT: AA, Aa or aa for each individual and PCA plot, with map</p>
 </div>
 <div id="further-analysis-of-region" class="section level1">
 <h1>4. Further analysis of region</h1>
 <p>INPUT: Genomic coordinates of interest, genotype category for each
-individual OUTPUT: Fst, LD, nuc diversity, GO</p>
+individual</p>
+<p>OUTPUT: Fst, LD (triangle and mean r2 aka u-figure), nuc diversity,
+GO</p>
 </div>
 </section>
 
