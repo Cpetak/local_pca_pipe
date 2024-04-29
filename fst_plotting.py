@@ -16,4 +16,4 @@ plt.plot(df["POS"], df["WEIR_AND_COCKERHAM_FST"], ".")
 plt.ylabel("Fst, homo1 vs homo2")
 plt.xlabel("Genomic position")
 
-plt.savefig(args.chr + "_" + str(args.start) + "_" + str(args.stop) + "fst_plot.pdf")
+plt.savefig(args.chr + "_" + str(args.start) + "_" + str(args.stop) + "fst_plot.jpg")

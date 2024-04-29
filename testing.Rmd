@@ -89,10 +89,8 @@ Expected heterozygote / observed: `r file_contents[4]`.
 
 ### Fst between homozygotes
 
-```{r,echo=FALSE}
-file_path<- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "_fst.weir.fst") 
-file_contents <- readLines(file_path)
+```{r,echo=FALSE,out.height = "300px", out.width='1000px',fig.align='center'}
+file_path<- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "fst_plot.jpg") 
+knitr::include_graphics(file_path)
 ```
-
-NW_022145594.1_12670717_16440127_fst.weir.fst
 

@@ -1,6 +1,6 @@
-#args <- commandArgs(trailingOnly=TRUE)
-myFileName <- "NW_022145594.1_filtered.gds" #args[1]
-myWindowSize <- 10000
+args <- commandArgs(trailingOnly=TRUE)
+myFileName <- args[1]
+myWindowSize <- as.integer(args[2])
 
 pattern <- "NW_(.*?)\\.1"
 myChrom <- regmatches(myFileName, regexpr(pattern, myFileName, perl=TRUE))

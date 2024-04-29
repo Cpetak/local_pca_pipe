@@ -6,7 +6,7 @@
   jobId <- as.numeric(args[1])
   nJobs <- as.numeric(args[2])
   myFileName <- args[3]
-  myWindowSize <- args[4]
+  myWindowSize <- as.integer(args[4])
 
   pattern <- "NW_(.*?)\\.1"
   myChrom <- regmatches(myFileName, regexpr(pattern, myFileName, perl=TRUE))
