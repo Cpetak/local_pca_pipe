@@ -1,0 +1,17 @@
+---
+title: "testing"
+output: html_document
+date: "2024-04-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r, echo=FALSE, out.height = "460px", out.width='800px',}
+knitr::include_graphics("~/WGS/local_pca_pipe/NW_022145594.1_12670717_16440127_pies.pdf")
+```
+
