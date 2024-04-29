@@ -378,3 +378,8 @@ ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point(
 ```
 
 ## B. Nucleotide diversity
+
+# 7. Making a report
+
+Rscript -e "rmarkdown::render('testing.Rmd', params=list(chr =
+'NW_022145594.1', start = '12670717', stop = '16440127'))"

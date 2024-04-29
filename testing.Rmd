@@ -14,11 +14,38 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Results for chromosome `r params$chr`
 
+## Local PCA outputs
 
+
+```{r, echo=FALSE, out.height = "400px", out.width='1000px',}
+all_files <- list.files('~/WGS/local_pca_pipe/lostruct_results/')
+print(all_files)
+
+for (file in all_files) {
+  if (grepl(params$chr, file)) {
+    print(file)
+    
+    split_string <- strsplit(file, "_")[[1]]
+  
+    window_type <- split_string[2]
+    window_size <- split_string[4]
+    
+    curr_file<-paste0(file, "/figure/run_summary/plot_corners-1.png")
+    print(paste0("Window type: ", window_type, "Window size: ", window_size))
+    knitr::include_graphics(curr_file)
+  } 
+  
+}
+```
+
+
+
+# Plot plot
 ```{r, echo=FALSE, out.height = "400px", out.width='1000px',}
 print(params)
 file_path <- paste0("~/WGS/local_pca_pipe/", params$chr, "_", params$start, "_", params$stop, "_pies.pdf")
 print(file_path)
 knitr::include_graphics(file_path)
 ```
+
 
