@@ -221,5 +221,13 @@ print(ehomoq/len(homoq)) #expected minor is 1.5 more
 print(ehomop/len(homop)) #expected major is 1.2 more
 print(ehete/len(hetero)) #actual hete is 1.2 more
 
-print(chisquare(f_obs=observed_counts, f_exp=[ehomoq,ehete,ehomop]))
+result = chisquare(f_obs=observed_counts, f_exp=[ehomoq,ehete,ehomop])
+print(result)
+
+with open(args.df1[:-9]+"_chi2.txt", "w") as file:
+    # Write the variable to the file
+    file.write(str(result.pvalue) + "\n")
+    file.write(str(ehomoq/len(homoq)) + "\n")
+    file.write(str(ehomop/len(homop)) + "\n")
+    file.write(str(ehete/len(hetero)) + "\n")
 
