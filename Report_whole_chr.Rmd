@@ -1,0 +1,94 @@
+---
+title: "Summary report"
+output: html_document
+date: "2024-04-29"
+params:
+  chr: 'NW_022145594.1'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Results for chromosome `r params$chr`
+
+## Local PCA outputs
+
+
+```{r, echo=FALSE,}
+library(gtools)
+all_files <- list.files('~/WGS/local_pca_pipe/lostruct_results/')
+all_files <- mixedsort(all_files)
+
+my_plots1<- list()
+my_plots2<- list()
+for (file in all_files) {
+  if (grepl(params$chr, file)) {
+    split_string <- strsplit(file, "_")[[1]]
+    window_type <- split_string[2]
+    window_size <- split_string[4]
+    print(paste0("Window type: ", window_type, " Window size: ", window_size))
+    
+    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results/', file, "/figure/run_summary/plot_corners-1.png")
+    my_plots1<-append(my_plots1,curr_file)
+    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results/', file, "/figure/run_summary/plot_corner_pca-1_1_2.pdf")
+    my_plots2<-append(my_plots2,curr_file)
+  } 
+  
+}
+```
+
+```{r, echo=FALSE, out.height = "300px", out.width='1000px',}
+simple_list1 <- unlist(my_plots1, recursive = FALSE)
+knitr::include_graphics(simple_list1)
+```
+
+```{r, echo=FALSE, out.height = "200px", out.width='1000px',}
+simple_list2 <- unlist(my_plots2, recursive = FALSE)
+knitr::include_graphics(simple_list2)
+```
+
+## Finding outlier regions
+```{r, echo=FALSE, out.height = "800px", out.width='1000px',}
+file_path <- paste0("~/WGS/local_pca_pipe/outlier_regions_snp_chromosome_", params$chr, ".pdf")
+knitr::include_graphics(file_path)
+```
+
+## Analysing specific region
+
+Analyzing `r params$chr` for start `r params$start` and stop `r params$stop` region.
+
+### Group individuals according to genotype (AA, Aa, aa)
+
+```{r, echo=FALSE, out.height = "500px", out.width='800px',fig.align='center'}
+file_path <- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "_PCA.pdf") 
+knitr::include_graphics(file_path)
+```
+```{r, echo=FALSE, out.height = "300px", out.width='800px',fig.align='center'}
+file_path <- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "_pies.pdf") 
+knitr::include_graphics(file_path)
+```
+```{r, echo=FALSE, out.height = "600px", out.width='800px',fig.align='center'}
+file_path <- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "_map.pdf") 
+knitr::include_graphics(file_path)
+```
+
+```{r,echo=FALSE,warning=FALSE}
+file_path<- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "_chi2.txt") 
+file_contents <- readLines(file_path)
+```
+Chi-squared p-value: `r file_contents[1]`.
+
+Expected homozygote to the minor allele / observed: `r file_contents[2]`.
+
+Expected homozygote to the major allele / observed: `r file_contents[3]`.
+
+Expected heterozygote / observed: `r file_contents[4]`.
+
+### Fst between homozygotes
+
+```{r,echo=FALSE,out.height = "300px", out.width='1000px',fig.align='center'}
+file_path<- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "fst_plot.jpg") 
+knitr::include_graphics(file_path)
+```
+

@@ -314,11 +314,15 @@ Step 2:
 
 `vcftools --gzvcf ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf --weir-fst-pop NW_022145594.1_12670717_16440127_vcf_list_homoq --weir-fst-pop NW_022145594.1_12670717_16440127_vcf_list_homop --out NW_022145594.1_12670717_16440127_fst`
 
+Step 3:
+
+`python fst_plotting.py NW_022145594.1 12670717 16440127`
+
 **PUT TOGETHER**
 
 run: `bash 4_2_local_pca.sh NW_022145594.1 12670717 16440127`
 
-OUTPUT: Fst value for each position in the chromosome
+OUTPUT: Fst value for each position in the chromosome, and Fst plot
 
 # 5. GO enrichment
 
@@ -333,26 +337,39 @@ Step 1: Chromosome vcf file to gds
 Run:
 `Rscript vcf2gds.R ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf NW_022145594.1_filtered`,
 same script from before, makes gds file - pre-computed for all
-chromosomes, in folder TODO
+chromosomes, in folder
+\~/EG2023/structural_variation/backup/filtered_gds
 
 Step 2: Calculate LD with a certain window size
 
-run: `sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 100000`,
+To check how many windows a specific window size will produce:
+`Rscript LD_get_num_windows.R ~/EG2023/structural_variation/backup/filtered_gds/NW_022145594.1_filtered.gds 50000`
+
+> ***NOTE:*** Around 1,000 windows is good. Too big window size could
+> break the code if there are less than 1 windows, but too small window
+> size will take literally ages to compute!
+
+run: `sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 50000`,
 file name, window size, submits 200 jobs and calls makegrid.R. Output is
 200 files, each containing a subset of the windows.
 
 Step 3: Put together the 200 files
 
-run: `Rscript gather_results.R NW_022145594.1 100000` , output is
+run: `Rscript gather_results.R NW_022145594.1 50000` , output is
 combined_chrom_windowsize.Rdata
 
 run: `rm -rf ~/WGS/local_pca_pipe/makegrid_${1}_${2}`
 
 Step 4: Make triangle plot
 
-run: `Rscript plot_LD.R NW_022145594.1 100000`, output is a jpg
+run: `Rscript plot_LD.R NW_022145594.1 50000`, output is a jpg
 
 **PUT TOGETHER (given having .gds)**
+
+Below doesn't work, just run above lines separately. tricky because of
+the launching of jobs and only doing downstream code once those finish!
+have to play around with window size for each chromosome anyways but
+will only be done once.
 
 `bash 6_a_local_pca.sh NW_022145594.1 100000`
 
@@ -381,5 +398,10 @@ ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point(
 
 # 7. Making a report
 
-Rscript -e "rmarkdown::render('testing.Rmd', params=list(chr =
-'NW_022145594.1', start = '12670717', stop = '16440127'))"
+Just for local PCA results and finding interesting region:
+
+`Rscript -e "rmarkdown::render('Report_whole_chr.Rmd', params=list(chr = 'NW_022145594.1'))"`
+
+For all results for the chromosome and an interesting region:
+
+`Rscript -e "rmarkdown::render('testing.Rmd', params=list(chr = 'NW_022145594.1', start = '12670717', stop = '16440127'))"`
