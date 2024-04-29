@@ -5,10 +5,6 @@ myWindowSize <- args[4]
 pattern <- "NW_(.*?)\\.1"
 myChrom <- regmatches(myFileName, regexpr(pattern, myFileName, perl=TRUE))
 
-
-print(jobId)
-print(nJobs)
-
 # nJobs <- 1000; jobId <- 446
 
 ### libraries
