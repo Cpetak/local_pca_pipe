@@ -2,16 +2,23 @@
 title: "testing"
 output: html_document
 date: "2024-04-29"
+params:
+  chr: ''
+  start: ''
+  stop: ''
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Results for chromosome `r params$chr`
 
 
-```{r, echo=FALSE, out.height = "460px", out.width='800px',}
-knitr::include_graphics("~/WGS/local_pca_pipe/NW_022145594.1_12670717_16440127_pies.pdf")
+```{r, echo=FALSE, out.height = "400px", out.width='1000px',}
+print(params)
+file_path <- paste0("~/WGS/local_pca_pipe/", params$chr, "_", params$start, "_", params$stop, "_pies.pdf")
+print(file_path)
+knitr::include_graphics(file_path)
 ```
 
