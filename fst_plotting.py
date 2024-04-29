@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 parser = argparse.ArgumentParser(description="Description of your script")
-parser.add_argument("chrom", type=str, help="Chromosome name")
+parser.add_argument("chr", type=str, help="Chromosome name")
 parser.add_argument("start", type=int, help="start region")
 parser.add_argument("stop", type=int, default=0.1, help="stop region")
 args = parser.parse_args()
