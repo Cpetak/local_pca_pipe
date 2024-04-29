@@ -1,11 +1,9 @@
-args <- commandArgs(trailingOnly=TRUE)
-myFileName <- args[1]
-myWindowSize <- args[2]
+#args <- commandArgs(trailingOnly=TRUE)
+myFileName <- "NW_022145594.1_filtered.gds" #args[1]
+myWindowSize <- 10000
 
 pattern <- "NW_(.*?)\\.1"
 myChrom <- regmatches(myFileName, regexpr(pattern, myFileName, perl=TRUE))
-
-# nJobs <- 1000; jobId <- 446
 
 ### libraries
 library(SNPRelate)
@@ -18,8 +16,6 @@ registerDoMC(20)
 ### convert to snprelate GDS
 #vcf.fn <- "/project/berglandlab/Dmel_Single_Individuals/Phased_Whatshap_Shapeit4_final/CM_pops.AllChrs.Whatshap.shapeit.annot.wSNPids.vcf.gz"
 gds.fn <- myFileName
-
-#snpgdsVCF2GDS(vcf.fn, gds.fn, verbose=T)
 
 ### open
 genofile <- snpgdsOpen(gds.fn, allow.fork=TRUE)
