@@ -6,7 +6,7 @@ library(stringr)
 
 args <- commandArgs(trailingOnly=TRUE)
 
-root_folder <- paste("~/WGS/local_pca_pipe/makegrid_",+args[1]+"_"+args[2])
+root_folder <- paste0("~/WGS/local_pca_pipe/makegrid_",args[1],"_",args[2])
 
 files_r <- system(paste("ls -v",root_folder, sep = " "), inter = T)
 

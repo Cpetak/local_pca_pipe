@@ -3,3 +3,4 @@ test_data
 SbatchJob*
 vcf_col_ids
 vcf_header
+*.1_data

@@ -96,9 +96,9 @@ knitr::include_graphics(file_path)
 
 ## LD whole chromosome
 
-```{r,echo=FALSE,out.height = "300px", out.width='1000px',fig.align='center'}
+```{r,echo=FALSE,out.height = "600px", out.width='1000px',fig.align='center'}
 regex_pattern <- paste0("^", params$chr, ".*_LD\\.pdf$")
-LD_files<-list.files('~/WGS/local_pca_pipe/lostruct_results/',pattern = regex_pattern, full.names = TRUE)
+LD_files<-list.files('~/WGS/local_pca_pipe',pattern = regex_pattern, full.names = TRUE)
 #file_path<- paste0("~/WGS/local_pca_pipe/", params$chr,"_", params$start, "_",params$stop, "fst_plot.jpg") 
 knitr::include_graphics(LD_files)
 ```

@@ -8,7 +8,7 @@ library(viridis)
 
 args <- commandArgs(trailingOnly=TRUE)
 file <- paste("~/WGS/local_pca_pipe/", "combined_", args[1], "_", args[2],".Rdata", sep = "")
-outfile <- paste("~WGS/local_pca_pipe/", args[1], "_", args[2], ".pdf", sep="")
+outfile <- paste(args[1], "_", args[2], "_LD.pdf", sep="")
 
 load(file)
 
@@ -32,27 +32,24 @@ p1 <- ggplot(data=o[abs(win1-win2)>0][meanR2>0], aes(x=win1, y=win2, fill=meanR2
   geom_raster(data=o[win1!=win2][meanR2<0], aes(x=win1, y=win2), fill="grey39", alpha=.95) +
   theme_minimal() + coord_fixed(ratio = 1)
 
-p1 
-
 ggsave(outfile, plot = p1)
 
-ggplot(data=o[win1!=win2], aes(x=win1, y=win2, fill=meanR2)) + geom_tile() + scale_fill_viridis(option="F")
+#ggplot(data=o[win1!=win2], aes(x=win1, y=win2, fill=meanR2)) + geom_tile() + scale_fill_viridis(option="F")
 
 
-g2 <- ggplot(data=o[meanR2>0], aes(x=log10(abs(mid1-mid2)), y=meanR2), alpha=.5, size=.5) + geom_point()
+#g2 <- ggplot(data=o[meanR2>0], aes(x=log10(abs(mid1-mid2)), y=meanR2), alpha=.5, size=.5) + geom_point()
 #ggsave(g2, file="~/pairwise.jpg", h=8, w=8)
-g2
 
-o[,lDist:=log10(abs(mid1-mid2)+1)]
-t1 <- lm(meanR2~lDist, data=o[meanR2>0])
-o[meanR2>0,pred:=predict(t1)]
-o[,resid:=meanR2-pred]
+#o[,lDist:=log10(abs(mid1-mid2)+1)]
+#t1 <- lm(meanR2~lDist, data=o[meanR2>0])
+#o[meanR2>0,pred:=predict(t1)]
+#o[,resid:=meanR2-pred]
 
 
-p1 <- ggplot(data=o[meanR2>0], aes(x=win1, y=win2, fill=resid)) +
-  geom_raster() + scale_fill_viridis(option="H") +
-  geom_raster(data=o[win1!=win2][meanR2<0], aes(x=win1, y=win2), fill="grey39", alpha=.95) +
-  theme_minimal()
-p1
+#p1 <- ggplot(data=o[meanR2>0], aes(x=win1, y=win2, fill=resid)) +
+  #geom_raster() + scale_fill_viridis(option="H") +
+  #geom_raster(data=o[win1!=win2][meanR2<0], aes(x=win1, y=win2), fill="grey39", alpha=.95) +
+  #theme_minimal()
+#p1
 
 #ggsave(p1, file="~/ld_mat_r.jpg", h=8, w=10)

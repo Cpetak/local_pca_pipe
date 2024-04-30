@@ -24,4 +24,8 @@ echo "Starting sbatch script myscript.sh at:`date`"
 
 cd /users/c/p/cpetak/WGS/local_pca_pipe
 
+chr_name="${1::-13}"
+
+mkdir "/users/c/p/cpetak/WGS/local_pca_pipe/makegrid_${chr_name}_${2}"
+
 Rscript makegrid.R ${SLURM_ARRAY_TASK_ID} 200 ~/EG2023/structural_variation/backup/filtered_gds/$1 $2
