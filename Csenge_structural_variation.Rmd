@@ -280,13 +280,15 @@ and writes PC1 and PC2 to csv files.
 Step 4: Assign individuals to genotype groups, make plots
 
 run:
-`python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv`,
-output is 2 csv files with individual IDs (1-140) for each homozygote
-group and PCA, pie and map plots, and chi-square results to txt file
+`python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv 3`,
+last imput is number of clusters, output is 2 csv files with individual
+IDs (1-140) for each homozygote group and PCA, pie and map plots, and
+chi-square results to txt file
 
 **PUT TOGETHER**
 
-run: `bash 4_local_pca.sh NW_022145594.1 12670717 16440127`
+run: `bash 4_local_pca.sh NW_022145594.1 12670717 16440127 5` where 5 is
+the number of clusters
 
 OUT: AA, Aa or aa for each individual and PCA plot, with map
 
@@ -404,4 +406,4 @@ Just for local PCA results and finding interesting region:
 
 For all results for the chromosome and an interesting region:
 
-`Rscript -e "rmarkdown::render('testing.Rmd', params=list(chr = 'NW_022145594.1', start = '12670717', stop = '16440127'))"`
+`Rscript -e "rmarkdown::render('Report_regional.Rmd', params=list(chr = 'NW_022145594.1', start = '12670717', stop = '16440127'))"`

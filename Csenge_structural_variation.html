@@ -377,7 +377,7 @@ PCA and writes PC1 and PC2 to csv files.</p>
 <p>run:
 <code>python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv</code>,
 output is 2 csv files with individual IDs (1-140) for each homozygote
-group and PCA, pie and map plots</p>
+group and PCA, pie and map plots, and chi-square results to txt file</p>
 <p><strong>PUT TOGETHER</strong></p>
 <p>run:
 <code>bash 4_local_pca.sh NW_022145594.1 12670717 16440127</code></p>
@@ -400,10 +400,13 @@ column names to keep for each group</p>
 <p>Step 2:</p>
 <p><code>spack load vcftools@0.1.14</code></p>
 <p><code>vcftools --gzvcf ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf --weir-fst-pop NW_022145594.1_12670717_16440127_vcf_list_homoq --weir-fst-pop NW_022145594.1_12670717_16440127_vcf_list_homop --out NW_022145594.1_12670717_16440127_fst</code></p>
+<p>Step 3:</p>
+<p><code>python fst_plotting.py NW_022145594.1 12670717 16440127</code></p>
 <p><strong>PUT TOGETHER</strong></p>
 <p>run:
 <code>bash 4_2_local_pca.sh NW_022145594.1 12670717 16440127</code></p>
-<p>OUTPUT: Fst value for each position in the chromosome</p>
+<p>OUTPUT: Fst value for each position in the chromosome, and Fst
+plot</p>
 </div>
 <div id="go-enrichment" class="section level1">
 <h1>5. GO enrichment</h1>
@@ -418,20 +421,32 @@ column names to keep for each group</p>
 <p>Run:
 <code>Rscript vcf2gds.R ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf NW_022145594.1_filtered</code>,
 same script from before, makes gds file - pre-computed for all
-chromosomes, in folder TODO</p>
+chromosomes, in folder
+~/EG2023/structural_variation/backup/filtered_gds</p>
 <p>Step 2: Calculate LD with a certain window size</p>
+<p>To check how many windows a specific window size will produce:
+<code>Rscript LD_get_num_windows.R ~/EG2023/structural_variation/backup/filtered_gds/NW_022145594.1_filtered.gds 50000</code></p>
+<blockquote>
+<p><strong><em>NOTE:</em></strong> Around 1,000 windows is good. Too big
+window size could break the code if there are less than 1 windows, but
+too small window size will take literally ages to compute!</p>
+</blockquote>
 <p>run:
-<code>sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 100000</code>,
+<code>sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 50000</code>,
 file name, window size, submits 200 jobs and calls makegrid.R. Output is
 200 files, each containing a subset of the windows.</p>
 <p>Step 3: Put together the 200 files</p>
-<p>run: <code>Rscript gather_results.R NW_022145594.1 100000</code> ,
+<p>run: <code>Rscript gather_results.R NW_022145594.1 50000</code> ,
 output is combined_chrom_windowsize.Rdata</p>
 <p>run: <code>rm -rf ~/WGS/local_pca_pipe/makegrid_${1}_${2}</code></p>
 <p>Step 4: Make triangle plot</p>
-<p>run: <code>Rscript plot_LD.R NW_022145594.1 100000</code>, output is
-a jpg</p>
+<p>run: <code>Rscript plot_LD.R NW_022145594.1 50000</code>, output is a
+jpg</p>
 <p><strong>PUT TOGETHER (given having .gds)</strong></p>
+<p>Below doesn’t work, just run above lines separately. tricky because
+of the launching of jobs and only doing downstream code once those
+finish! have to play around with window size for each chromosome anyways
+but will only be done once.</p>
 <p><code>bash 6_a_local_pca.sh NW_022145594.1 100000</code></p>
 </div>
 <div id="triangle-and-u-plot-for-specific-region" class="section level3">
@@ -457,6 +472,13 @@ move output figures to avoid overwriting them!</p>
 <div id="b.-nucleotide-diversity" class="section level2">
 <h2>B. Nucleotide diversity</h2>
 </div>
+</div>
+<div id="making-a-report" class="section level1">
+<h1>7. Making a report</h1>
+<p>Just for local PCA results and finding interesting region:</p>
+<p><code>Rscript -e &quot;rmarkdown::render(&#39;Report_whole_chr.Rmd&#39;, params=list(chr = &#39;NW_022145594.1&#39;))&quot;</code></p>
+<p>For all results for the chromosome and an interesting region:</p>
+<p><code>Rscript -e &quot;rmarkdown::render(&#39;Report_regional.Rmd&#39;, params=list(chr = &#39;NW_022145594.1&#39;, start = &#39;12670717&#39;, stop = &#39;16440127&#39;))&quot;</code></p>
 </div>
 </section>
 
