@@ -55,6 +55,17 @@ def get_agglo_2d(x,y,k):
 
   return labels
 
+def find_elbow(x,y,dt):
+  X = np.array(x).reshape(-1, 1)
+  Y = np.array(y).reshape(-1, 1)
+
+  agg_clustering = AgglomerativeClustering(n_clusters=None, linkage='ward',distance_threshold=dt)
+
+  # Fit the model to the data
+  agg_clustering.fit(np.concatenate((X, Y), axis=1))
+
+  return agg_clustering.n_clusters_
+
 parser = argparse.ArgumentParser(description="Description of your script")
 parser.add_argument("df1", type=str, help="PC1 csv")
 parser.add_argument("df2", type=str, help="PC2 csv")
@@ -73,6 +84,19 @@ pops=np.array([item for item in pops for _ in range(20)])
 ind_id=np.array(list(range(1,len(pops)+1)))
 
 NUM_CLUST=args.k
+
+f_clusts=[]
+for i in np.arange(0.05,1,0.01):
+  f_clusts.append(find_elbow(dim1,dim2,i))
+
+plt.plot(np.arange(0.05,1,0.01), f_clusts)
+plt.axhline(3,color="red",linestyle=":")
+plt.axhline(5,color="red",linestyle=":")
+plt.ylim(0,max(f_clusts)+1)
+plt.yticks(np.arange(0, max(f_clusts), step=1))
+plt.ylabel("Number of clusters")
+plt.xlabel("The linkage distance threshold (above which clusters will not be merged)")
+plt.savefig(args.df1[:-9]+"_elbow.pdf")
 
 #clusts=get_agglo(dim1, NUM_CLUST)
 clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)

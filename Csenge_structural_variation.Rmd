@@ -282,8 +282,8 @@ Step 4: Assign individuals to genotype groups, make plots
 run:
 `python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv 3`,
 last imput is number of clusters, output is 2 csv files with individual
-IDs (1-140) for each homozygote group and PCA, pie and map plots, and
-chi-square results to txt file
+IDs (1-140) for each homozygote group and PCA, elbow, pie, line and map
+plots, and chi-square results to txt file
 
 **PUT TOGETHER**
 
