@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import argparse
 
+print("imported numpy")
+
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 from mpl_toolkits.basemap import Basemap as Basemap

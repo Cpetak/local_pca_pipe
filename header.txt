@@ -4,6 +4,8 @@
 #SBATCH --partition=bluemoon
 # Request nodes
 #SBATCH --nodes=1
+# Request some processor cores
+#SBATCH --ntasks=10
 # Request memory
 #SBATCH --mem=40G
 # Run for five minutes
@@ -18,7 +20,4 @@ cd ${SLURM_SUBMIT_DIR}
 
 # Executable section: echoing some Slurm data
 echo "Starting sbatch script myscript.sh at:`date`"
-
-cd /users/c/p/cpetak/WGS/local_pca_pipe
-
 
