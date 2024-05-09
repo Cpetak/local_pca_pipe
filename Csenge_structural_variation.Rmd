@@ -305,10 +305,12 @@ Step 1:
 
 `bcftools@1.10.2`
 
-run: `bash extract_inds_from_vcf.sh NW_022145594.1_12670717_16440127`,
-output is NW_022145594.1_12670717_16440127_vcf_list_homop and
-NW_022145594.1_12670717_16440127_vcf_list_homoq which are lists of vcf
-column names to keep for each group
+run: `bash extract_inds_from_vcf.sh NW_022145594.1_12670717_16440127 4`,
+4 is number of clusters minus 1, output is
+NW_022145594.1_12670717_16440127_vcf_list_homop and
+NW_022145594.1_12670717_16440127_vcf_list_homoq for 3 clusters or
+clust0...4 for 5 clusters which are lists of vcf column names to keep
+for each group
 
 Step 2:
 
@@ -322,11 +324,84 @@ Step 3:
 
 **PUT TOGETHER**
 
-run: `bash 4_2_local_pca.sh NW_022145594.1 12670717 16440127`
+run: `bash 4_2_local_pca.sh NW_022145594.1 12670717 16440127 4`, 4 is
+number of clusters minus 1
 
 OUTPUT: Fst value for each position in the chromosome, and Fst plot
 
 # 5. GO enrichment
+
+Step 1:
+
+Downloaded all uniprot ids and their corresponding GO terms through
+<https://www.ebi.ac.uk/QuickGO/annotations?taxonId=7668&taxonUsage=exact>.
+
+Processed file with:
+
+`awk -F "\t" '{print $2"\t"$5}' QuickGO-annotations-1642716310981-20220120.tsv > temp_mapping`
+
+`sed '$!N; /^\(.*\)\n\1$/!P; D' temp_mapping > temp2_mapping # It deletes duplicate, consecutive lines from a file`
+
+`awk 'BEGIN{FS="\t"} {for(i=2; i<=NF; i++) { if (!a[$1]) a[$1]=$1FS$i ;else a[$1]=a[$1]","$i};if ($1 != old) b[j++] = a[old];old=$1 } END{for (i=0; i<j; i++) print b[i] }' temp2_mapping > GO_mapping_topGO #it collapses repeated lines into 1, comma separated, output file is in this git repo`
+
+Two columns: Uniprot ID GO terms
+
+Step 2:
+
+Downloaded the gff file from the ncbi genome assembly
+
+Processed file with:
+
+`grep -o 'gene=LOC[0-9]\+' genomic.gff | sed 's/;.*//' | awk -F= '{print $2}' > all_locs_gff`
+
+`sed '$!N; /^\(.*\)\n\1$/!P; D' all_locs_gff > all_locs_gff2`
+
+32,087 genes
+
+Uploaded these LOC gene names to <https://www.uniprot.org/uploadlists/>
+From Ensemble Genomes To uniprot. Downloaded results. 3 columns: LOC id,
+uniprot id, uniprot id \_STRPU
+
+Step 3:
+
+Since a LOC id can map to more than 1 uniprot ids, I used this code to
+select a specific uniprot id for each LOC to avoid biasing the GO
+analysis: loc2uniprot.py -\> all_locs_to_uniprotIDs.txt LOC,uniprot
+(Note: to use, needed to sort file using the sort
+all_locs_to_uniprotIDs.txt command.
+
+Step 4:
+
+Genomic region to GO analysis input:
+
+3 files - includes genes that overlap region breakpoints, excludes genes
+that overlap region breakpoints, list of genes the overlap breakpoints.
+
+in this example the region is 100 - 100_000, chr=`NW_022144746.1`
+
+1: The end is after the region start, the start is before the region
+end. Includes genes that span beyond entire region.
+
+`awk '$1 = "NW_022144746.1"' genomic.gff | awk '$5 >= 100 {print}' | awk '$4 =< 100000 {print}' | grep -o 'gene=LOC[0-9]\+' | awk -F= '{print $2}' | sort | uniq > locs1.txt`
+
+2: The start is after the region start, the end is before the region
+end.
+
+`awk '$1 = "NW_022144746.1"' genomic.gff | awk '$4 >= 100 {print}' | awk '$5 =< 100000 {print}' | grep -o 'gene=LOC[0-9]\+' | awk -F= '{print $2}' | sort | uniq > locs2.txt`
+
+3: Genes at the two breakpoints
+
+`awk '$1 = "NW_022144746.1"' genomic.gff | awk '$5 >= 100 {print}' | awk '$4 =< 100 {print}' | grep -o 'gene=LOC[0-9]\+' | awk -F= '{print $2}' > locs3_1.txt`
+
+`awk '$1 = "NW_022144746.1"' genomic.gff | awk '$5 >= 100000 {print}' | awk '$4 =< 100000 {print}' | grep -o 'gene=LOC[0-9]\+' | awk -F= '{print $2}' > locs3_2.txt`
+
+`cat locs3_1.txt locs3_2.txt | sort | uniq > locs3.txt` uniq is needed
+at this step because genes that span both breakpoints will be listed
+twice
+
+`join -t, -1 1 -2 1 -o 1.1,2.2 locs3.txt all_locs_to_uniprotID.txt | awk -F, '{print $2}' > uniprot3.txt`
+
+
 
 # 6. Whole chromosome analysis
 
