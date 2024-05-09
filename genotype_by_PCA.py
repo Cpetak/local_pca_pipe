@@ -101,6 +101,8 @@ plt.savefig(args.df1[:-9]+"_elbow.pdf")
 #clusts=get_agglo(dim1, NUM_CLUST)
 clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)
 
+f, axs = plt.subplots(figsize=(10, 10))
+
 pop_dic={}
 id_dic={}
 for c in range(NUM_CLUST):

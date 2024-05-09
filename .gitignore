@@ -5,3 +5,5 @@ vcf_col_ids
 vcf_header
 *.1_data
 NW_022145*
+*.pdf
+supp_files/
