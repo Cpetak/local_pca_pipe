@@ -173,7 +173,7 @@ plot( mds.coords[,mds.cols[1:2]], pch=cpch,
 points( corner.mds, pch=20, cex=5,
         col=adjustcolor(corner.cols,0.25))
 text( corner.mds, labels=seq_len(nrow(corner.mds)), 
-        col=corner.cols, cex=2, lwd=2 )
+        col="black", cex=2, lwd=2 )
 opar2 <- par(mar=c(par("mar"),spacing/2)[c(5,2,3,4)])
 for (k in mds.cols) {
     lastone <- (k==mds.cols[length(mds.cols)])

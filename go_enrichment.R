@@ -8,13 +8,14 @@ mystop <- args[3]
 geneID2GO <- readMappings("supp_files/GO_mapping_topGO") # uniprot to GO mapping
 geneNames <- names(geneID2GO)
 
-get_go_res <- funtion(ont_type,geneList,fname_out){
+get_go_res <- function(ont_type,geneList,fname_out){
   GOdata <- new("topGOdata", 
                 ontology = ont_type, # ontology of interest (BP, MF or CC)
                 allGenes = geneList,
                 annot = annFUN.gene2GO, 
                 gene2GO = geneID2GO)
   resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
+  print(resultFisher)
   num_sig<-length(resultFisher@score[resultFisher@score < 0.01])
   allRes <- GenTable(GOdata, classicFisher = resultFisher, topNodes = num_sig)
   write.table(allRes, file = fname_out, sep = ",", 
@@ -31,7 +32,7 @@ for (i in 1:3){
   geneList <- factor(as.integer(geneNames %in% intgenes)) # mask of 0 and 1 if geneName is interesting
   names(geneList) <- geneNames # geneList but annotated with the gene names
   
-  for (t in list(BP,MF,CC)){
+  for (t in list("BP","MF","CC")){
     get_go_res(ont_type=t,geneList=geneList,fname_out=fname_out)
   }
   

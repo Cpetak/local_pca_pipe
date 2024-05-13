@@ -48,11 +48,6 @@ simple_list2 <- unlist(my_plots2, recursive = FALSE)
 knitr::include_graphics(simple_list2)
 ```
 
-## Finding outlier regions
-```{r, echo=FALSE, out.height = "800px", out.width='1000px',}
-file_path <- paste0("~/WGS/local_pca_pipe/outlier_regions_snp_chromosome_", params$chr, ".pdf")
-knitr::include_graphics(file_path)
-```
 
 
 
