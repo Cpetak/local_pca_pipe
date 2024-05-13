@@ -16,4 +16,4 @@ join -t, -1 1 -2 1 -o 1.1,2.2 ${1}_${2}_${3}_locs1.txt supp_files/all_locs_to_un
 join -t, -1 1 -2 1 -o 1.1,2.2 ${1}_${2}_${3}_locs2.txt supp_files/all_locs_to_uniprotIDs.txt | awk -F, '{print $2}' > ${1}_${2}_${3}_uniprot2.txt
 join -t, -1 1 -2 1 -o 1.1,2.2 ${1}_${2}_${3}_locs3.txt supp_files/all_locs_to_uniprotIDs.txt | awk -F, '{print $2}' > ${1}_${2}_${3}_uniprot3.txt
 
-Rscript go_enrichment.R ${1}_${2}_${3}_uniprot1.txt
+Rscript go_enrichment.R $chr $start $stop

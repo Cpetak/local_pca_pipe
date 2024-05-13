@@ -98,8 +98,10 @@ plt.ylabel("Number of clusters")
 plt.xlabel("The linkage distance threshold (above which clusters will not be merged)")
 plt.savefig(args.df1[:-9]+"_elbow.pdf")
 
-#clusts=get_agglo(dim1, NUM_CLUST)
-clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)
+if NUM_CLUST == 3:
+  clusts=get_agglo(dim1, NUM_CLUST)
+else:
+  clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)
 
 f, axs = plt.subplots(figsize=(10, 10))
 

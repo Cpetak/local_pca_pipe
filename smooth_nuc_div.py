@@ -11,7 +11,7 @@ parser.add_argument("--stop", type=int, default=0, help="stop of region of inter
 parser.add_argument("--calc", type=bool, default=True, help="whether to calculate smooth or load")
 args = parser.parse_args()
 
-fname="~/EG2023/structural_variation/backup/filtered_vcf/nuc_div"+args.chr+"_filtered_nuc_div.sites.pi"
+fname="~/EG2023/structural_variation/backup/filtered_vcf/nuc_div/"+args.chr+"_filtered_nuc_div.sites.pi"
 
 df = pd.read_csv(fname, sep="\t")
 xs = df["POS"].values.astype(np.float64)
