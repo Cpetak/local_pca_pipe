@@ -103,6 +103,9 @@ if NUM_CLUST == 3:
 else:
   clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)
 
+all_cols=["yellow","green","purple",'red', 'blue', 'orange', 'cyan', 'magenta', 'brown', 'lime']
+p_colors= all_cols[:NUM_CLUST]
+
 f, axs = plt.subplots(figsize=(10, 10))
 
 pop_dic={}
@@ -112,7 +115,7 @@ for c in range(NUM_CLUST):
   print(len(t))
   x=[i[0] for i in dim[t]]
   y=[i[1] for i in dim[t]]
-  plt.scatter(x,y,edgecolors="black")
+  plt.scatter(x,y,edgecolors="black",c=p_colors[c])
   avx=sum(x)/len(x)
   ids=pops[t]
   pop_dic[c]=[avx,ids]
@@ -177,8 +180,6 @@ else:
 
 f, axs = plt.subplots(1, 7, sharey=True, figsize=(12, 3), subplot_kw=dict(aspect="equal"))
 
-all_cols=["yellow","green","purple",'red', 'blue', 'orange', 'cyan', 'magenta', 'brown', 'lime']
-p_colors= all_cols[:NUM_CLUST]
 pops=["FOG","CAP","KIB","BOD","TER","LOM","SAN"]
 
 temp_nums=[]
