@@ -11,6 +11,9 @@ editor_options:
 
 # Using local PCA on the urchins
 
+Note: in this project, there was no filtering by MAF (minor allele
+frequency).
+
 # 1. Input data processing
 
 The pipeline will start from filtered bcf files, one for each of the 21
@@ -280,9 +283,9 @@ and writes PC1 and PC2 to csv files.
 Step 4: Assign individuals to genotype groups, make plots
 
 run:
-`python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv 3`,
-last imput is number of clusters, output is 2 csv files with individual
-IDs (1-140) for each homozygote group and PCA, elbow, pie, line and map
+`python genotype_by_PCA.py NW_022145594.1_12670717_16440127_dim1.csv NW_022145594.1_12670717_16440127_dim2.csv 3 NW_022145594.1_12670717_16440127_perc_explained.csv`,
+3 is number of clusters, output is 2 csv files with individual IDs
+(1-140) for each homozygote group and PCA, elbow, pie, line and map
 plots, and chi-square results to txt file
 
 **PUT TOGETHER**
@@ -427,6 +430,8 @@ To check how many windows a specific window size will produce:
 > break the code if there are less than 1 windows, but too small window
 > size will take literally ages to compute!
 
+`mkdir makegrid_NW_022145597.1_50000`
+
 run: `sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 50000`,
 file name, window size, submits 200 jobs and calls makegrid.R. Output is
 200 files, each containing a subset of the windows.
@@ -469,7 +474,7 @@ load("~/WGS/local_pca_pipe/combined_30k_job.Rdata")
 o <- na.omit(o)
 
 #All window average r2 
-ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point()
+p1<-ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point()
 ```
 
 ## B. Nucleotide diversity
@@ -487,3 +492,28 @@ Just for local PCA results and finding interesting region:
 For all results for the chromosome and an interesting region:
 
 `Rscript -e "rmarkdown::render('Report_regional.Rmd', params=list(chr = 'NW_022145594.1', start = '12670717', stop = '16440127'))"`
+
+Rerunning for 137 individuals, without the 3 outliers:
+
+bcftools view -S all_rmdups_noout.txt -o noout.vcf
+NW_022145594.1_filtered.bcf
+
+WIP
+
+sbatch noout_filter.txt NW_022145594.1
+
+Do above for all chromosomes. Right now I am running lostruct for 137
+subsetted chromosome 94. already fixed 2_1_local_pca_snp.sh
+
+also, made a launcher for all_chromosomes, but need to change it to take
+noout folder
+
+how to look for windows where pops cluster
+
+that could also be used to find PC combination that clusters the whole
+genome by pops
+
+i'd like it to be non-binary, so that I can sort by how much the window
+or PC combo is clustering by pops
+
+alternatively can also cluster by ph variability or N vs S
