@@ -5,7 +5,7 @@ chr <- args[1]
 mystart <- args[2]
 mystop <- args[3]
 
-geneID2GO <- readMappings("supp_files/GO_mapping_topGO") # uniprot to GO mapping
+geneID2GO <- readMappings("~/WGS/local_pca_pipe/supp_files/GO_mapping_topGO") # uniprot to GO mapping
 geneNames <- names(geneID2GO)
 
 get_go_res <- function(ont_type,geneList,fname_out){

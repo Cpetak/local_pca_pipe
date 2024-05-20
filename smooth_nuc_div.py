@@ -5,11 +5,13 @@ import matplotlib.pyplot as plt
 import argparse
 
 parser = argparse.ArgumentParser(description="Description of your script")
-parser.add_argument("chr", type=str, help="Chromosome name")
+parser.add_argument("-chr", type=str, help="Chromosome name")
 parser.add_argument("--start", type=int, default=0, help="start of region of interest")
 parser.add_argument("--stop", type=int, default=0, help="stop of region of interest")
-parser.add_argument("--calc", type=bool, default=True, help="whether to calculate smooth or load")
+parser.add_argument("--calc", type=int, default=1, help="whether to calculate smooth or load")
 args = parser.parse_args()
+
+print(args.chr, args.start, args.stop, args.calc)
 
 fname="~/EG2023/structural_variation/backup/filtered_vcf/nuc_div/"+args.chr+"_filtered_nuc_div.sites.pi"
 
@@ -75,24 +77,26 @@ def gauss_smart(xs, ys, sigma=1.0, th=1e-8):
 
 plt.figure(figsize=(14, 6))
 
-if args.calc:
+if args.calc == 1:
+    print("Calculating")
     smooth = gauss_smart(xs, ys, sigma, 1e-8)
-    np.save(fname + "_smooth.npy", smooth)
+    np.save(args.chr + "_smooth.npy", smooth)
 else:
-    smooth=np.load(fname + "_smooth.npy")
+    print("Loading")
+    smooth=np.load(args.chr + "_smooth.npy")
 
 plt.plot(xs, smooth, label=f"{sigma}", color="black")
 
 plt.tight_layout()
-plt.savefig(fname + "_nuc_plot.pdf")
+plt.savefig(args.chr + "_nuc_plot.pdf")
 
 if args.stop == 0 and args.start == 0:
     print("No specific region highlighted")
 else:
-    smooth = np.load(fname + "_smooth.npy")
+    smooth = np.load(args.chr + "_smooth.npy")
 
     plt.figure(figsize=(14, 6))
-    plt.plot(xs, smooth, ",", label=f"{sigma}", color="black")
+    plt.plot(xs, smooth, label=f"{sigma}", color="black")
     a, b = args.start, args.stop
 
     v1 = smooth[np.where((xs < a))]
@@ -113,26 +117,26 @@ else:
         color="red",
     )
     plt.plot(
-        np.linspace(b, c, len(v3)),
+        np.linspace(b, xs.max(), len(v3)),
         np.ones(len(v3)) * v3.mean(),
         color="red",
     )
-    plt.plot(
-        np.linspace(c, d, len(v4)),
-        np.ones(len(v4)) * v4.mean(),
-        color="red",
-    )
-    plt.plot(
-        np.linspace(d, xs.max(), len(v5)),
-        np.ones(len(v5)) * v5.mean(),
-        color="red",
-    )
+    #plt.plot(
+        #np.linspace(c, d, len(v4)),
+        #np.ones(len(v4)) * v4.mean(),
+        #color="red",
+    #)
+    #plt.plot(
+        #np.linspace(d, xs.max(), len(v5)),
+        #np.ones(len(v5)) * v5.mean(),
+        #color="red",
+    #)
     plt.axvline(a, color="orange")
     plt.axvline(b, color="orange")
-    plt.axvline(c, color="blue")
-    plt.axvline(d, color="blue")
+    #plt.axvline(c, color="blue")
+    #plt.axvline(d, color="blue")
     plt.ylim(m / 2, M * 2)
     plt.xlim(0, xs.max())
     plt.tight_layout()
-    plt.savefig(fname + "_nuc_plot_wregion.pdf")
+    plt.savefig(args.chr + "_nuc_plot_wregion.pdf")
 

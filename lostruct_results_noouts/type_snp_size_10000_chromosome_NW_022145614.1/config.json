@@ -1,0 +1,19 @@
+{
+  "input_dir": ["/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index_noouts/NW_022145614.1"],
+  "sample_info": ["/gpfs1/home/c/p/cpetak/WGS/local_pca_pipe/sample_info.tsv"],
+  "type": ["snp"],
+  "size": [10000],
+  "npc": [2],
+  "nmds": [2],
+  "missing": [0],
+  "subsample": [1],
+  "outdir": ["/users/c/p/cpetak/WGS/local_pca_pipe/lostruct_results_noouts/type_snp_size_10000_chromosome_NW_022145614.1"],
+  "chromname": ["NW_022145614.1"],
+  "jobid": ["219242"],
+  "help": [false],
+  "start.time": ["2024-05-16 14:23:52"],
+  "run.dir": ["/gpfs1/home/c/p/cpetak/WGS/local_pca_pipe"],
+  "weights": [1],
+  "bcf_files": ["/gpfs1/home/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index_noouts/NW_022145614.1/NW_022145614.1_filtered.bcf"],
+  "chrom.names": ["NW_022145614.1"]
+}

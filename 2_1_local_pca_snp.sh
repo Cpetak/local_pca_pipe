@@ -3,7 +3,7 @@
 
 echo "Chromosome number: $1"
 
-input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index/${1}"
+input_dir="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index_noouts/${1}"
 
 echo $input_dir
 
@@ -12,7 +12,7 @@ do
 	echo "$snp"
 	FILE=$(mktemp)
   	cat header.txt >> $FILE
-  	echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1}" >> $FILE
+  	echo "Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ${input_dir} -t snp -s ${snp} -I ~/WGS/local_pca_pipe/sample_info.tsv -c ${1} -o ~/WGS/local_pca_pipe/lostruct_results_noouts/type_snp_size_${snp}_chromosome_${1}" >> $FILE
     sbatch $FILE
   	cat $FILE
     sleep 0.1

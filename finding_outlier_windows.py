@@ -48,7 +48,7 @@ def get_groups(values, k, df):
 
 def get_figs(size, m, ax, mythr):
     
-    route="~/WGS/local_pca_pipe/lostruct_results/type_" + mtype + "_size_" + str(size) + "_chromosome_" + chrom
+    route="~/WGS/local_pca_pipe/lostruct_results_noouts/type_" + mtype + "_size_" + str(size) + "_chromosome_" + chrom
     coords = pd.read_csv(route + "/" + chrom + ".regions.csv")
     mds = pd.read_csv(route + "/mds_coords.csv")
     lpca = coords.join(mds["MDS1"])

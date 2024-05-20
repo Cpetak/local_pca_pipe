@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE,}
 library(gtools)
-all_files <- list.files('~/WGS/local_pca_pipe/lostruct_results/')
+all_files <- list.files('~/WGS/local_pca_pipe/lostruct_results_noouts/')
 all_files <- mixedsort(all_files)
 
 my_plots1<- list()
@@ -29,9 +29,9 @@ for (file in all_files) {
     window_size <- split_string[4]
     print(paste0("Window type: ", window_type, " Window size: ", window_size))
     
-    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results/', file, "/figure/run_summary/plot_corners-1.png")
+    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results_noouts/', file, "/figure/run_summary/plot_corners-1.png")
     my_plots1<-append(my_plots1,curr_file)
-    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results/', file, "/figure/run_summary/plot_corner_pca-1_1_2.pdf")
+    curr_file<-paste0('~/WGS/local_pca_pipe/lostruct_results_noouts/', file, "/figure/run_summary/plot_corner_pca-1_1_2.pdf")
     my_plots2<-append(my_plots2,curr_file)
   } 
   

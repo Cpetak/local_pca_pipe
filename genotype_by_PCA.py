@@ -70,6 +70,7 @@ parser = argparse.ArgumentParser(description="Description of your script")
 parser.add_argument("df1", type=str, help="PC1 csv")
 parser.add_argument("df2", type=str, help="PC2 csv")
 parser.add_argument("k", type=int, help="Number of clusters")
+parser.add_argument("perc_explained", type=str, help="File for percent explained for PC 1 and 2")
 
 args = parser.parse_args()
 
@@ -77,6 +78,9 @@ df1=pd.read_csv(args.df1)
 df2=pd.read_csv(args.df2)
 dim1=df1["dim1"].tolist()
 dim2=df2["dim2"].tolist()
+
+pe=pd.read_csv(args.perc_explained,names=["pes"])
+pes_list=pe.pes.to_list()
 
 dim=np.array(list(zip(dim1,dim2)))
 pops=["BOD", "CAP", "FOG", "KIB", "LOM", "SAN", "TER"]
@@ -120,8 +124,8 @@ for c in range(NUM_CLUST):
   ids=pops[t]
   pop_dic[c]=[avx,ids]
   id_dic[c]=[avx,ind_id[t]]
-plt.ylabel("PC 2",fontsize=18)
-plt.xlabel("PC 1",fontsize=18)
+plt.ylabel("PC 2, "+str(pes_list[1])+" %",fontsize=18)
+plt.xlabel("PC 1, "+str(pes_list[0])+" %",fontsize=18)
 print("made first figure")
 plt.savefig(args.df1[:-9]+"_PCA.pdf")
 
