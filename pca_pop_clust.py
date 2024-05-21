@@ -36,6 +36,8 @@ def get_agglo(values, k):
 NUM_CLUST=7
 
 vals=[]
+max_idx=0
+max_val=0
 for i in trange(len(df)):
   pcs=df.iloc[i].to_list()[3:]
   p1=np.array(pcs[:140])
@@ -54,8 +56,14 @@ for i in trange(len(df)):
       perc+=mc/len(c_pops) #what percentage of the cluster is the most common pop, higher better
 
     vals.append(perc) #max is 7
+    
+    if perc > max_val:
+      max_val = perc
+      max_idx = i
+      
 
 plt.hist(vals)
 plt.savefig(chrom+"_popclust_hist.pdf")
 
+print("Maximum value: ", max_val, " Maximum index: ", max_idx)
 
