@@ -6,6 +6,7 @@ import numpy as np
 from tqdm import trange
 from collections import Counter
 import argparse
+from scipy import stats
 
 parser = argparse.ArgumentParser(description="Description of your script")
 parser.add_argument("chrom", type=str, help="Chromosome name")
@@ -15,7 +16,7 @@ chrom=args.chrom
 
 coords=pd.read_csv("lostruct_results/type_snp_size_1000_chromosome_"+chrom+"/"+chrom+".regions.csv")
 
-df=pd.read_csv("lostruct_results/type_snp_size_1000_chromosome_"+chrom+"/"+chrom+".regions.csv")
+df=pd.read_csv("lostruct_results/type_snp_size_1000_chromosome_"+chrom+"/"+chrom+".pca.csv")
 
 pops=df.columns.to_list()[3:]
 pops=[i.split("_")[3] for i in pops]
@@ -38,32 +39,29 @@ NUM_CLUST=7
 vals=[]
 max_idx=0
 max_val=0
+max_pval=0
 for i in trange(len(df)):
   pcs=df.iloc[i].to_list()[3:]
-  p1=np.array(pcs[:140])
+  p1=pcs[:140]
+  p2=pcs[140:]
 
-  if np.isnan(p1).any():
-    vals.append(0)
+  if np.isnan(p1).any() == False:
 
-  else:
-    clusts=get_agglo(p1,NUM_CLUST)
+    tdf=pd.DataFrame()
+    tdf["p1"] = p1
+    tdf["p2"] = p2
+    tdf["pops"] = pops
+    tdf["geo"] = np.repeat([4, 6, 7, 5, 2, 1, 3],20)
 
-    perc=0
-    for c in range(NUM_CLUST):
-      t=np.where(np.array(clusts) == c)[0]
-      c_pops=np.array(pops)[t]
-      mc=Counter(c_pops).most_common(1)[0][1]
-      perc+=mc/len(c_pops) #what percentage of the cluster is the most common pop, higher better
-
-    vals.append(perc) #max is 7
-    
-    if perc > max_val:
-      max_val = perc
+    corr_coeff, p_value = stats.pearsonr(tdf['geo'], tdf['p1'])
+  
+    if abs(corr_coeff) > abs(max_val):
+      max_val = corr_coeff
       max_idx = i
-      
+      max_pval = p_value
 
-plt.hist(vals)
-plt.savefig(chrom+"_popclust_hist.pdf")
 
-print("Maximum value: ", max_val, " Maximum index: ", max_idx)
+#plt.savefig(chrom+"_popclust_hist.pdf")
+
+print("Maximum value: ", max_val, " Maximum index: ", max_idx, " p_value: ", max_pval)
 

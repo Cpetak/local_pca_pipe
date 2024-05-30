@@ -195,7 +195,7 @@ Now, we'll look at PCA plots from the extracted corners.
 (this is done without a ton of memory by accumulating the covariance matrix in `running_cov`):
 ```{r corner_pca, cache=TRUE, echo=-1}
 options(datatable.fread.input.cmd.message=FALSE)
-corner.npc <- 2
+corner.npc <- 4
 corner.regions <- vector(mode='list', length=ncol(mds.corners))
 for (k in seq_along(corner.regions)) {
     corner.regions[[k]] <- regions[ mds.corners[,k],]

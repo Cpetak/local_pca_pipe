@@ -22,11 +22,13 @@ cd ${SLURM_SUBMIT_DIR}
 echo "Starting sbatch script myscript.sh at:`date`"
 
 mychr=$1
-myfolder="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index_noouts/${mychr}"
+myfolder="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_bcf_index_second_filter/${mychr}"
 
 cd /users/c/p/cpetak/WGS/local_pca_pipe
 
-bcftools view -S all_rmdups_noout.txt -o ${myfolder}/${mychr}_filtered_noout.vcf ${myfolder}/${mychr}_filtered.bcf
+#bcftools view -S all_rmdups_noout.txt -o ${myfolder}/${mychr}_filtered_noout.vcf ${myfolder}/${mychr}_filtered.bcf
+#bcftools view -e 'AC < 14' --exclude-types 'indels,mnps,ref,bnd,other' -m2 -M2 ${myfolder}/${mychr}_filtered.bcf > ${myfolder}/${mychr}_filtered_noout.vcf
+bcftools view -T ^supp_files/Spur_repeats_02 ${myfolder}/${mychr}_filtered.bcf -o ${myfolder}/${mychr}_filtered_noout.vcf
 
 rm ${myfolder}/${mychr}_filtered.bcf
 

@@ -25,6 +25,7 @@ get_go_res <- function(ont_type,geneList,fname_out){
 
 for (i in 1:3){
   fname_in <- paste0(chr,"_",mystart,"_",mystop,"_","uniprot",i,".txt")
+  print(fname_in)
   fname_out <- paste0(chr,"_",mystart,"_",mystop,"_","GoEn",i,".csv")
   
   myInterestingGenes <- read.csv(fname_in, header = FALSE) # list of interesting genes, output of LOC to uniprot mapping

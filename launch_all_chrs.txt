@@ -27,4 +27,4 @@ echo "Starting sbatch script myscript.sh at:`date`"
 
 cd /users/c/p/cpetak/WGS/local_pca_pipe
 
-Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ~/EG2023/structural_variation/backup/filtered_bcf_index_noouts/all_together -t snp -s 100000 -I ~/WGS/local_pca_pipe/sample_info_noouts.tsv -o ~/WGS/local_pca_pipe/lostruct_results_noouts/type_snp_size_${snp}_all_chromosomes
+Rscript ~/WGS/local_pca_pipe/run_lostruct.R -i ~/EG2023/structural_variation/backup/filtered_bcf_index_second_filter/all_together -t snp -s 10000 -I ~/WGS/local_pca_pipe/sample_info_noouts.tsv -o ~/WGS/local_pca_pipe/lostruct_results_second_filter/type_snp_size_10000_all_chromosomes
