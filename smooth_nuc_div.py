@@ -5,15 +5,16 @@ import matplotlib.pyplot as plt
 import argparse
 
 parser = argparse.ArgumentParser(description="Description of your script")
-parser.add_argument("-chr", type=str, help="Chromosome name")
-parser.add_argument("--start", type=int, default=0, help="start of region of interest")
-parser.add_argument("--stop", type=int, default=0, help="stop of region of interest")
+#parser.add_argument("-chr", type=str, help="Chromosome name")
+#parser.add_argument("--start", type=int, default=0, help="start of region of interest")
+#parser.add_argument("--stop", type=int, default=0, help="stop of region of interest")
 parser.add_argument("--calc", type=int, default=1, help="whether to calculate smooth or load")
 args = parser.parse_args()
 
-print(args.chr, args.start, args.stop, args.calc)
+#print(args.chr, args.start, args.stop, args.calc)
 
-fname="~/EG2023/structural_variation/backup/filtered_vcf/nuc_div/"+args.chr+"_filtered_nuc_div.sites.pi"
+#fname="~/EG2023/structural_variation/backup/filtered_vcf/nuc_div/"+args.chr+"_filtered_nuc_div.sites.pi"
+fname="~/Downloads/NW_022145595.1_filtered_nuc_div.sites.pi"
 
 df = pd.read_csv(fname, sep="\t")
 xs = df["POS"].values.astype(np.float64)
@@ -24,6 +25,9 @@ ixs = np.argsort(xs)
 xs = xs[ixs]
 ys = ys[ixs]
 
+plt.plot(xs, np.ones_like(ys), ".")
+plt.show()
+exit()
 def norm01(xs):
     m, M = xs.min(), xs.max()
     return (xs - m) / (M - m)

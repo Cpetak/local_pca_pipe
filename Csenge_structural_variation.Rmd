@@ -517,3 +517,25 @@ i'd like it to be non-binary, so that I can sort by how much the window
 or PC combo is clustering by pops
 
 alternatively can also cluster by ph variability or N vs S
+
+WIP further filtering, also by repetitive regions
+
+coverage:
+
+cp NW_022145594.1_12703097_16386233_vcf_list_homop
+NW_022145594.1_12703097_16386233_cov_list_homop
+
+cp NW_022145594.1_12703097_16386233_vcf_list_homoq
+NW_022145594.1_12703097_16386233_cov_list_homoq
+
+sed -i
+'s#/users/c/p/cpetak/WGS/BWA_out#/netfiles/pespenilab_share/urchin_bams#g'
+NW_022145594.1_12703097_16386233_cov_list_homop
+
+sed -i
+'s#/users/c/p/cpetak/WGS/BWA_out#/netfiles/pespenilab_share/urchin_bams#g'
+NW_022145594.1_12703097_16386233_cov_list_homoq
+
+bash cov_launcher.sh NW_022145594.1_12703097_16386233_cov_list_homoq
+
+within that: samtools depth -b \$pos_file \$line \> \$out_name.coverage
