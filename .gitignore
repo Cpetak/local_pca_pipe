@@ -2,9 +2,10 @@ lostruct_results*
 test_data
 SbatchJob*
 vcf_col_ids
-vcf_header
+vcf_header*
 *.1_data
 NW_022145*
 *.pdf
 supp_files/
 reports_noouts
+old_results
