@@ -260,12 +260,13 @@ plt.savefig(args.df1[:-9]+"_map.pdf")
 if NUM_CLUST == 3:
 
   observed_counts = [len(homoq), len(hetero), len(homop)]
+  tot=sum(observed_counts)
 
-  p=(len(homop)*2 + len(hetero))/280
-  q=(len(homoq)*2 + len(hetero))/280
-  ehomoq = q*q*140 #24, actual 16
-  ehomop = p*p*140 #49, actual 41
-  ehete = 2*q*p*140 #68, actual 83
+  p=(len(homop)*2 + len(hetero))/(tot*2)
+  q=(len(homoq)*2 + len(hetero))/(tot*2)
+  ehomoq = q*q*tot #24, actual 16
+  ehomop = p*p*tot #49, actual 41
+  ehete = 2*q*p*tot #68, actual 83
 
   print(ehomoq/len(homoq)) #expected minor is 1.5 more
   print(ehomop/len(homop)) #expected major is 1.2 more

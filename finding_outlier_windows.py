@@ -50,6 +50,7 @@ def get_figs(size, m, ax, mythr):
     
     route="~/WGS/inversion_results/lostruct_results/type_" + mtype + "_size_" + str(size) + "_chromosome_" + chrom
     coords = pd.read_csv(route + "/" + chrom + ".regions.csv")
+    print(coords.head())
     mds = pd.read_csv(route + "/mds_coords.csv")
     lpca = coords.join(mds["MDS1"])
     lpca = lpca.join(mds["MDS2"])

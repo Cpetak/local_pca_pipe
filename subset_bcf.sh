@@ -4,7 +4,7 @@ chrom=$1
 mystart=$2
 myend=$3
 
-input_vcf="/users/c/p/cpetak/EG2023/structural_variation/backup/filtered_vcf_filtered/${chrom}_filtered.vcf"
+input_vcf="/users/c/p/cpetak/EG2023/structural_variation/filtered_bcf_files/${chrom}/${chrom}_filtered.vcf"
 
 grep -v \# $input_vcf | awk -v myvariable=$mystart '$2 >= myvariable' | awk -v myvariable=$myend '$2 <= myvariable' > temp.vcf
 
