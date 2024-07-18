@@ -8,7 +8,7 @@ parser.add_argument("start", type=int, help="start region")
 parser.add_argument("stop", type=int, default=0.1, help="stop region")
 args = parser.parse_args()
 
-filename="~/WGS/local_pca_pipe/" + args.chr + "_" + str(args.start) + "_" + str(args.stop) + "_fst.weir.fst"
+filename="~/WGS/inversion_results/" + args.chr + "_" + str(args.start) + "_" + str(args.stop) + "_fst.weir.fst"
 df=pd.read_csv(filename, sep="\t")
 
 fig, ax1 = plt.subplots(figsize=(16, 8))

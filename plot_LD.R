@@ -7,7 +7,7 @@ library(viridis)
 #load("~/WGS/LD_chr/makegrid_outs/job1_50000_10000.Rdata")
 
 args <- commandArgs(trailingOnly=TRUE)
-file <- paste("~/WGS/local_pca_pipe/", "combined_", args[1], "_", args[2],".Rdata", sep = "")
+file <- paste("~/WGS/inversion_results/", "combined_", args[1], "_", args[2],".Rdata", sep = "")
 outfile <- paste(args[1], "_", args[2], "_LD.pdf", sep="")
 
 load(file)
