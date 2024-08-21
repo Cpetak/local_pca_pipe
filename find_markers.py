@@ -7,7 +7,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Description of your script")
 parser.add_argument("num_rand", type=int, help="Number of times to randomly sample")
 parser.add_argument("cat", type=str, help="Genotype to compare to, homop, homoq or hetero")
-parser.add_argument("calc_markers", type=bool, help="Whether or not to calculate 12 markers")
+parser.add_argument("calc_markers", type=int, help="Whether or not to calculate 12 markers")
 
 args = parser.parse_args()
 
@@ -56,7 +56,7 @@ def process_df(filename):
   return doneq
 
 mypath='/gpfs1/home/c/p/cpetak/WGS/inversion_results/'
-if args.calc_markers:
+if args.calc_markers == 1:
     q=process_df(mypath+'NW_022145594.1_homoq.vcf')
     q = q.rename(columns={q.columns[1]: 'q'})
 
