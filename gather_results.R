@@ -6,7 +6,7 @@ library(stringr)
 
 args <- commandArgs(trailingOnly=TRUE)
 
-root_folder <- paste0("~/WGS/inversion_results/makegrid_",args[1],"_",args[2])
+root_folder <- paste0("~/WGS/local_pca_pipe/makegrid_",args[1],"_",args[2])
 
 files_r <- system(paste("ls -v",root_folder, sep = " "), inter = T)
 
@@ -35,4 +35,4 @@ o <- foreach(i=files_r, .combine = "rbind")%do%{
   
 }
 setDT(o)
-save(o, file=paste("~/WGS/inversion_results/", "combined_", args[1], "_", args[2], ".Rdata", sep = ""))
+save(o, file=paste("~/WGS/local_pca_pipe/makegrid_",args[1],"_",args[2], "/combined_", args[1], "_", args[2], ".Rdata", sep = ""))

@@ -4,14 +4,14 @@ from tqdm import tqdm
 
 """**Question**: do uniprotIDs mapped to the same LOC share similar GO terms?"""
 
-locs=pd.read_csv("idmapping_2024_05_09.tsv", sep="\t")
+locs=pd.read_csv("supp_files/idmapping_2024_08_21.tsv", sep="\t")
 #locs=pd.read_csv("uniprot-pcangsd_all.tab", sep="\t", names=("LOC","uni","1","2","3","4","5","6"), header=None)
 #locs = locs.iloc[1: , :]
 
 locs = locs.rename(columns={'From': 'LOC'})
 locs = locs.rename(columns={'Entry': 'uni'})
 
-mapping=pd.read_csv("GO_mapping_topGO", sep="\t", names=("uni","go"))
+mapping=pd.read_csv("supp_files/GO_mapping_topGO", sep="\t", names=("uni","go"))
 
 mydic={}
 for index, row in locs.iterrows():

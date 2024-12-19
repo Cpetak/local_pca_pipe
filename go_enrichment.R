@@ -17,10 +17,16 @@ get_go_res <- function(ont_type,geneList,fname_out){
   resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
   print(resultFisher)
   num_sig<-length(resultFisher@score[resultFisher@score < 0.01])
+  print("num significant")
+  print(num_sig)
   allRes <- GenTable(GOdata, classicFisher = resultFisher, topNodes = num_sig)
+  print("printing allRes")
+  print(allRes)
+  if (num_sig > 0) {
   write.table(allRes, file = fname_out, sep = ",", 
               append = TRUE, quote = FALSE, 
               col.names = FALSE, row.names = FALSE) 
+  }
 }
 
 for (i in 1:3){

@@ -2,6 +2,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import numpy as np
+print("before pandas")
 import pandas as pd
 import argparse
 from scipy.stats import chisquare
@@ -9,6 +10,8 @@ from scipy.stats import chisquare
 from sklearn.cluster import KMeans
 from sklearn.cluster import AgglomerativeClustering
 from mpl_toolkits.basemap import Basemap as Basemap
+
+from scipy import stats
 
 def get_KMeans(values, k):
     # Convert the list to a numpy array
@@ -79,12 +82,25 @@ df2=pd.read_csv(args.df2)
 dim1=df1["dim1"].tolist()
 dim2=df2["dim2"].tolist()
 
+print(len(dim1))
+print(len(dim2))
+
 pe=pd.read_csv(args.perc_explained,names=["pes"])
 pes_list=pe.pes.to_list()
 
 dim=np.array(list(zip(dim1,dim2)))
 pops=["BOD", "CAP", "FOG", "KIB", "LOM", "SAN", "TER"]
-pops=np.array([item for item in pops for _ in range(20)])
+tpop=[]
+for p in pops:
+  if p != "CAP" and p!= "FOG":
+    tpop.append([p] * 20)
+  else:
+    if p == "CAP":
+      tpop.append([p] * 19)
+    if p == "FOG":
+      tpop.append([p] * 18)
+
+pops=np.array([x for xs in tpop for x in xs]) #np.array([item for item in pops for _ in range(20)])
 ind_id=np.array(list(range(1,len(pops)+1)))
 
 NUM_CLUST=args.k
@@ -109,6 +125,7 @@ else:
 
 all_cols=["yellow","green","purple",'red', 'blue', 'orange', 'cyan', 'magenta', 'brown', 'lime']
 p_colors= all_cols[:NUM_CLUST]
+pca_colors = ["purple", "green","yellow"]
 
 f, axs = plt.subplots(figsize=(10, 10))
 
@@ -119,7 +136,7 @@ for c in range(NUM_CLUST):
   print(len(t))
   x=[i[0] for i in dim[t]]
   y=[i[1] for i in dim[t]]
-  plt.scatter(x,y,edgecolors="black",c=p_colors[c])
+  plt.scatter(x,y,edgecolors="black",c=pca_colors[c])
   avx=sum(x)/len(x)
   ids=pops[t]
   pop_dic[c]=[avx,ids]
@@ -164,7 +181,12 @@ if NUM_CLUST == 3: #Old code to find "homozygote minor allele, heterozygote, hom
   for pop in pops:
     one=q_dic[pop]
     two=p_dic[pop]
-    three=20-(one+two)
+    if pop == "FOG":
+      three=18-(one+two)
+    elif pop == "CAP":
+      three=19-(one+two)
+    else:
+      three=20-(one+two)
     pq_dic[pop]=three
     per_pops[pop]["one"]= one
     per_pops[pop]["two"]= two
@@ -187,6 +209,7 @@ f, axs = plt.subplots(1, 7, sharey=True, figsize=(12, 3), subplot_kw=dict(aspect
 pops=["FOG","CAP","KIB","BOD","TER","LOM","SAN"]
 
 temp_nums=[]
+print(per_pops)
 for i,k in enumerate(per_pops.keys()):
   labels = []
   sizes = []
@@ -199,13 +222,22 @@ for i,k in enumerate(per_pops.keys()):
   axs[i].title.set_text(pops[i])
 plt.savefig(args.df1[:-9]+"_pies.pdf")
 
-f, axs = plt.subplots(figsize=(10, 4))
+NS_coordinates = [44.840000, 42.840000, 39.60412, 38.3182, 36.94841, 34.718893, 32.651389]
 
+f, axs = plt.subplots(figsize=(10, 4))
+pop_lens = np.array(temp_nums).sum(axis = 1)
 x = np.arange(7)
 for i,l in enumerate(np.array(temp_nums).T):
-  plt.plot(l/20, ".",linestyle=":",markersize=10,c=p_colors[i])
+  print(l/pop_lens)
+  if i == 2:
+    het_freqs = l/pop_lens
+  if i == 1:
+    homop_freqs = l/pop_lens
+  if i == 0:
+    homoq_freqs = l/pop_lens
+  plt.plot(NS_coordinates, l/pop_lens, ".",linestyle=":",markersize=10,c=p_colors[i])
   plt.ylabel("Genotype frequency")
-  plt.xticks(x, pops)
+  plt.xticks(NS_coordinates, pops)
   plt.xlabel("Populations")
 plt.savefig(args.df1[:-9]+"_lines.pdf")
 
@@ -281,3 +313,25 @@ if NUM_CLUST == 3:
       file.write(str(ehomoq/len(homoq)) + "\n")
       file.write(str(ehomop/len(homop)) + "\n")
       file.write(str(ehete/len(hetero)) + "\n")
+
+
+#het_freqs = np.array([0.5, 0.47368421, 0.45, 0.7, 0.7, 0.6, 0.7])
+#homop_freqs = np.array([0.33333333, 0.47368421, 0.45, 0.15, 0.15, 0.35, 0.15])
+p_freq = het_freqs/[2] + homop_freqs
+#plt.plot(p_freq, label="p")
+#plt.plot(het_freqs, label="het")
+#plt.ylim(0.2, 0.8)
+#plt.legend()
+
+#slope, intercept, r_value, p_value, std_err = stats.linregress(list(range(len(het_freqs))), het_freqs)
+slope, intercept, r_value, p_value, std_err = stats.linregress(NS_coordinates, het_freqs)
+print("hetero correlation")
+print(slope, r_value, p_value)
+#slope, intercept, r_value, p_value, std_err = stats.linregress(list(range(len(homop_freqs))), homop_freqs)
+slope, intercept, r_value, p_value, std_err = stats.linregress(NS_coordinates, homop_freqs)
+print("homop correlation")
+print(slope, r_value, p_value)
+#slope, intercept, r_value, p_value, std_err = stats.linregress(list(range(len(homoq_freqs))), homoq_freqs)
+slope, intercept, r_value, p_value, std_err = stats.linregress(NS_coordinates, homoq_freqs)
+print("homoq correlation")
+print(slope, r_value, p_value)
