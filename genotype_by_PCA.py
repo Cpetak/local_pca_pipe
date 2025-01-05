@@ -123,11 +123,32 @@ if NUM_CLUST == 3:
 else:
   clusts=get_agglo_2d(dim1,dim2,NUM_CLUST)
 
-all_cols=["yellow","green","purple",'red', 'blue', 'orange', 'cyan', 'magenta', 'brown', 'lime']
+#order of colors: homoq, homop, hetero
+all_cols=["C0","C1","C2",'red', 'blue', 'orange', 'cyan', 'magenta', 'brown', 'lime']
 p_colors= all_cols[:NUM_CLUST]
-pca_colors = ["purple", "green","yellow"]
+#pca_colors = ["purple", "green","yellow"]
 
 f, axs = plt.subplots(figsize=(10, 10))
+
+coloring_dic={}
+for c in range(NUM_CLUST):
+  t=np.where(np.array(clusts) == c)[0]
+  x=[i[0] for i in dim[t]]
+  if min(x) == min(dim1):
+    coloring_dic["left"] = c
+  elif max(x) == max(dim1):
+    coloring_dic["right"] = c
+  else:
+    coloring_dic["middle"] = c
+
+coloring_dic2={}
+coloring_dic2[coloring_dic["middle"]] = all_cols[2]
+if Counter(clusts)[coloring_dic["left"]] > Counter(clusts)[coloring_dic["right"]]:
+  coloring_dic2[coloring_dic["left"]] = all_cols[1]
+  coloring_dic2[coloring_dic["right"]] = all_cols[0]
+else:
+  coloring_dic2[coloring_dic["left"]] = all_cols[0]
+  coloring_dic2[coloring_dic["right"]] = all_cols[1]
 
 pop_dic={}
 id_dic={}
@@ -136,13 +157,15 @@ for c in range(NUM_CLUST):
   print(len(t))
   x=[i[0] for i in dim[t]]
   y=[i[1] for i in dim[t]]
-  plt.scatter(x,y,edgecolors="black",c=pca_colors[c])
+  plt.scatter(x,y,c=coloring_dic2[c],s=100)
   avx=sum(x)/len(x)
   ids=pops[t]
   pop_dic[c]=[avx,ids]
   id_dic[c]=[avx,ind_id[t]]
-plt.ylabel("PC 2, "+str(pes_list[1])+" %",fontsize=18)
-plt.xlabel("PC 1, "+str(pes_list[0])+" %",fontsize=18)
+plt.ylabel("PC 2, "+str(round(pes_list[1], 2))+" %",fontsize=64)
+plt.xlabel("PC 1, "+str(round(pes_list[0], 2))+" %",fontsize=64)
+plt.xticks([])
+plt.yticks([])
 print("made first figure")
 plt.savefig(args.df1[:-9]+"_PCA.pdf")
 
@@ -235,7 +258,7 @@ for i,l in enumerate(np.array(temp_nums).T):
     homop_freqs = l/pop_lens
   if i == 0:
     homoq_freqs = l/pop_lens
-  plt.plot(NS_coordinates, l/pop_lens, ".",linestyle=":",markersize=10,c=p_colors[i])
+  plt.plot(NS_coordinates, l/pop_lens, ".",linestyle="-",markersize=10,c=p_colors[i])
   plt.ylabel("Genotype frequency")
   plt.xticks(NS_coordinates, pops)
   plt.xlabel("Populations")
@@ -260,6 +283,11 @@ m = Basemap(
 
 m.drawcountries()
 m.drawcoastlines()
+#m.drawmapboundary(fill_color='#ADD8E6')  # Fill water with blue
+#m.fillcontinents(color='lightgray', lake_color='blue')  # Fill continents and lakes
+#m.drawparallels(range(int(llcrnrlat), int(urcrnrlat) + 1, 5), labels=[1, 0, 0, 0], fontsize=10)  # Latitude lines
+#m.drawmeridians(range(int(llcrnrlon), int(urcrnrlon) + 1, 5), labels=[0, 0, 0, 1], fontsize=10)  # Longitude lines
+
 
 #pops=["FOG","CAP","KIB","BOD","TER","LOM","SAN"]
 pop_coords=[(-124,44.8),(-124.5,42.8),(-123.8,39.6),(-123,38.3),(-122,36.9),(-120.6,34.7),(-117.25,32.6)]
@@ -307,6 +335,22 @@ if NUM_CLUST == 3:
   result = chisquare(f_obs=observed_counts, f_exp=[ehomoq,ehete,ehomop])
   print(result)
 
+  #per pop
+  print(pop_lens)
+  hets=het_freqs*pop_lens
+  homps=homop_freqs*pop_lens
+  homqs=homoq_freqs*pop_lens
+  for i in range(7):
+    pop_p=(homps[i]*2 + hets[i])/(pop_lens[i]*2)
+    pop_q=(homqs[i]*2 + hets[i])/(pop_lens[i]*2)
+    ehomq = pop_q*pop_q*pop_lens[i]
+    ehomp = pop_p*pop_p*pop_lens[i]
+    ehet = 2*pop_p*pop_q*pop_lens[i]
+
+    result = chisquare(f_obs=[homqs[i], hets[i],homps[i]], f_exp=[ehomq,ehet,ehomp])
+    print(result)
+
+
   with open(args.df1[:-9]+"_chi2.txt", "w") as file:
       # Write the variable to the file
       file.write(str(result.pvalue) + "\n")
@@ -334,4 +378,11 @@ print(slope, r_value, p_value)
 #slope, intercept, r_value, p_value, std_err = stats.linregress(list(range(len(homoq_freqs))), homoq_freqs)
 slope, intercept, r_value, p_value, std_err = stats.linregress(NS_coordinates, homoq_freqs)
 print("homoq correlation")
+print(slope, r_value, p_value)
+
+qs=homoq_freqs*2+het_freqs
+ps=homop_freqs*2+het_freqs
+print(qs)
+slope, intercept, r_value, p_value, std_err = stats.linregress(NS_coordinates,qs )
+print("qs correlation")
 print(slope, r_value, p_value)

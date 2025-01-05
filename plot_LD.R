@@ -13,7 +13,8 @@ if (interactive()) {
   args <- c("NW_022145597.1", "500","all")
 }
 
-file <- paste("~/WGS/local_pca_pipe/makegrid_",args[1],"_",args[2], "/combined_", args[1], "_", args[2],".Rdata", sep = "")
+file <- paste("~/WGS/local_pca_pipe/makegrid_",args[1],"_",args[2],"_all1", "/combined_", args[1], "_", args[2],".Rdata", sep = "")
+print(file)
 outfile <- paste(args[1], "_", args[2], "_LD_", args[3], ".pdf", sep="")
 
 load(file)
@@ -48,8 +49,12 @@ new_o <- o#[o$stop1 < upper & o$stop2 < upper, ]
 p1 <- ggplot(data=new_o[abs(win1-win2)>0][meanR2>0], aes(x=win1, y=win2, fill=meanR2)) +
   geom_tile() + 
   theme_minimal() + coord_fixed(ratio = 1)+
+  #geom_tile(data=new_o[!complete.cases(new_o), ], aes(x=win1, y=win2), fill="black", alpha=0.4) +
   #scale_fill_gradient2(low = "blue", mid = "white", high = "red")+
   scale_fill_viridis(option="H") #limits = c(0, 0.2), trans = "sqrt")
+  #theme(
+    #panel.background = element_rect(fill = "lightblue")  # change panel background
+  #)
   #geom_hline(yintercept = line3, color = "red", linetype = "dashed", size = 1) +
   #geom_vline(xintercept = line2, color = "red", linetype = "dashed", size = 1)
 
