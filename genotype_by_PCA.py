@@ -334,6 +334,8 @@ if NUM_CLUST == 3:
 
   result = chisquare(f_obs=observed_counts, f_exp=[ehomoq,ehete,ehomop])
   print(result)
+  print(observed_counts)
+  print([ehomoq,ehete,ehomop])
 
   #per pop
   print(pop_lens)
