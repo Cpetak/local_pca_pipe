@@ -295,6 +295,8 @@ the number of clusters
 
 OUT: AA, Aa or aa for each individual and PCA plot, with map
 
+
+
 # 4.2 Fst between homozygotes
 
 INPUT: Individual IDs for the two homozygote groups, bcf file of the
@@ -331,6 +333,78 @@ run: `bash 4_2_local_pca.sh NW_022145594.1 12670717 16440127 4`, 4 is
 number of clusters minus 1
 
 OUTPUT: Fst value for each position in the chromosome, and Fst plot
+
+## Nucleotide diversity
+
+For each chromosome, need to be done only once:
+
+`vcftools --vcf NW_022145611.1_filtered.vcf --site-pi --out NW_022145611.1_filtered_nuc_div`
+
+### Triangle LD plot, aka window-based approach
+
+Step 1: Chromosome vcf file to gds
+
+Run:
+`Rscript vcf2gds.R ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf NW_022145594.1_filtered`,
+same script from before, makes gds file - pre-computed for all
+chromosomes, in folder
+\~/EG2023/structural_variation/backup/filtered_gds
+
+Step 2: Calculate LD with a certain window size
+
+To check how many windows a specific window size will produce:
+`Rscript LD_get_num_windows.R ~/EG2023/structural_variation/backup/filtered_gds/NW_022145594.1_filtered.gds 50000`
+
+> ***NOTE:*** Around 1,000 windows is good. Too big window size could
+> break the code if there are less than 1 windows, but too small window
+> size will take literally ages to compute!
+
+`mkdir makegrid_NW_022145597.1_50000`
+
+run: `sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 50000`,
+file name, window size, submits 200 jobs and calls makegrid.R. Output is
+200 files, each containing a subset of the windows.
+
+Step 3: Put together the 200 files
+
+run: `Rscript gather_results.R NW_022145594.1 50000` , output is
+combined_chrom_windowsize.Rdata
+
+run: `rm -rf ~/WGS/local_pca_pipe/makegrid_${1}_${2}`
+
+Step 4: Make triangle plot
+
+run: `Rscript plot_LD.R NW_022145594.1 50000`, output is a jpg
+
+**PUT TOGETHER (given having .gds)**
+
+Below doesn't work, just run above lines separately. tricky because of
+the launching of jobs and only doing downstream code once those finish!
+have to play around with window size for each chromosome anyways but
+will only be done once.
+
+`bash 6_a_local_pca.sh NW_022145594.1 100000`
+
+### Triangle and U-plot for specific region
+
+For zooming in a specific region, repeat above but with a subsetted vcf
+
+> ***NOTE:*** Above code can be used that same but file names only
+> include chromosome and LD window size so make sure to move output
+> figures to avoid overwriting them!
+
+For U-plot:
+
+``` r
+library(ggplot2) 
+load("~/WGS/local_pca_pipe/combined_30k_job.Rdata")
+
+#Get rid of NAs 
+o <- na.omit(o)
+
+#All window average r2 
+p1<-ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point()
+```
 
 # 5. GO enrichment
 
@@ -407,81 +481,6 @@ twice
 Then to do the GO enrichment:
 `Rscript go_enrichment.R NW_022145603.1 8314835 9044676`
 
-# 6. Whole chromosome analysis
-
-## A. Linkage disequilibrium
-
-### Triangle LD plot, aka window-based approach
-
-Step 1: Chromosome vcf file to gds
-
-Run:
-`Rscript vcf2gds.R ~/EG2023/structural_variation/backup/filtered_vcf/NW_022145594.1_filtered.vcf NW_022145594.1_filtered`,
-same script from before, makes gds file - pre-computed for all
-chromosomes, in folder
-\~/EG2023/structural_variation/backup/filtered_gds
-
-Step 2: Calculate LD with a certain window size
-
-To check how many windows a specific window size will produce:
-`Rscript LD_get_num_windows.R ~/EG2023/structural_variation/backup/filtered_gds/NW_022145594.1_filtered.gds 50000`
-
-> ***NOTE:*** Around 1,000 windows is good. Too big window size could
-> break the code if there are less than 1 windows, but too small window
-> size will take literally ages to compute!
-
-`mkdir makegrid_NW_022145597.1_50000`
-
-run: `sbatch makegrid_launcher.sh NW_022145594.1_filtered.gds 50000`,
-file name, window size, submits 200 jobs and calls makegrid.R. Output is
-200 files, each containing a subset of the windows.
-
-Step 3: Put together the 200 files
-
-run: `Rscript gather_results.R NW_022145594.1 50000` , output is
-combined_chrom_windowsize.Rdata
-
-run: `rm -rf ~/WGS/local_pca_pipe/makegrid_${1}_${2}`
-
-Step 4: Make triangle plot
-
-run: `Rscript plot_LD.R NW_022145594.1 50000`, output is a jpg
-
-**PUT TOGETHER (given having .gds)**
-
-Below doesn't work, just run above lines separately. tricky because of
-the launching of jobs and only doing downstream code once those finish!
-have to play around with window size for each chromosome anyways but
-will only be done once.
-
-`bash 6_a_local_pca.sh NW_022145594.1 100000`
-
-### Triangle and U-plot for specific region
-
-For zooming in a specific region, repeat above but with a subsetted vcf
-
-> ***NOTE:*** Above code can be used that same but file names only
-> include chromosome and LD window size so make sure to move output
-> figures to avoid overwriting them!
-
-For U-plot:
-
-``` r
-library(ggplot2) 
-load("~/WGS/local_pca_pipe/combined_30k_job.Rdata")
-
-#Get rid of NAs 
-o <- na.omit(o)
-
-#All window average r2 
-p1<-ggplot(data=o, aes(x=abs(mid1-mid2), y=meanR2), alpha=.5, size=.5) + geom_point()
-```
-
-## B. Nucleotide diversity
-
-For each chromosome, need to be done only once:
-
-`vcftools --vcf NW_022145611.1_filtered.vcf --site-pi --out NW_022145611.1_filtered_nuc_div`
 
 # 7. Making a report
 
@@ -497,6 +496,8 @@ Rerunning for 137 individuals, without the 3 outliers:
 
 bcftools view -S all_rmdups_noout.txt -o noout.vcf
 NW_022145594.1_filtered.bcf
+
+#------------------------------------------ITT TARTOK
 
 WIP
 
