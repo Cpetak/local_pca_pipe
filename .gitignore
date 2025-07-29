@@ -13,3 +13,4 @@ plink
 makegrid_NW_02214*
 snpeff_remote
 snpEff_local
+*.vcf
